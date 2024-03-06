@@ -155,16 +155,41 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
                                             std::vector<G4LogicalVolume*> fiberUnitIntersection_[], std::vector<G4LogicalVolume*> fiberCladIntersection_[], std::vector<G4LogicalVolume*> fiberCoreIntersection_[], 
                                             std::vector<DRsimInterface::DRsimModuleProperty>& ModuleProp_) {
 
-  auto tSimpleBox = new G4Box("Mudule", (??) *mm, (??) *mm, (??) *mm );
-  auto tLogSimpleBox = new G4LogicalVolume( ?? , FindMaterial("Copper"), ??);
-  auto tPhySimpleBox = new G4PVPlacement( ?? , ?? , ?? , ?? ,  ?? , false, 0, checkOverlaps);
+  // Fe pipe
+  auto tSimpleBox = new G4Box("SimpleBox", (1004. / 2.) *mm, (37.5 / 2.) *mm, (37.5 / 2.) *mm );
+  auto tLogSimpleBoxC = new G4LogicalVolume(tSimpleBox, FindMaterial("Copper"), "SimpleBoxLogC");
+  auto tLogSimpleBoxS = new G4LogicalVolume(tSimpleBox, FindMaterial("Copper"), "SimpleBoxLogS");
+  auto tPhySimpleBoxC1 = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.,18.75,-18.75), tLogSimpleBoxC, "SimpleBoxPhyC1", worldLogical, false, 0, false);
+  auto tPhySimpleBoxC2 = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.,-18.75,18.75), tLogSimpleBoxC, "SimpleBoxPhyC2", worldLogical, false, 0, false);
+  auto tPhySimpleBoxS1 = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.,18.75,18.75), tLogSimpleBoxS, "SimpleBoxPhyS1", worldLogical, false, 0, false);
+  auto tPhySimpleBoxS2 = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.,-18.75,-18.75), tLogSimpleBoxS, "SimpleBoxPhyS2", worldLogical, false, 0, false);
 
+  // Al pipe
+  auto tAlBox = new G4Box("AlBox", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm );
+  auto tLogAlBoxC = new G4LogicalVolume(tAlBox, FindMaterial("Copper"), "AlBoxLogC");
+  auto tLogAlBoxS = new G4LogicalVolume(tAlBox, FindMaterial("Copper"), "AlBoxLogS");
+  auto tPhyAlBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(2.5,0.,0.), tLogAlBoxC, "AlBoxPhyC", tLogSimpleBoxC, false, 0, false);
+  auto tPhyAlBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(2.5,0.,0.), tLogAlBoxS, "AlBoxPhyS", tLogSimpleBoxS, false, 0, false);
 
-  // new G4PVPlacement( ?? , ?? , ?? , ?? ,  ?? , false, 0, checkOverlaps);
+  // Water 
+  auto tWaterBox = new G4Box("WaterBox", (996.75 / 2.) *mm, (25. / 2.) *mm, (25. / 2.) *mm );
+  auto tLogWaterBoxC = new G4LogicalVolume(tWaterBox, FindMaterial("Copper"), "WaterBoxLogC");
+  auto tLogWaterBoxS = new G4LogicalVolume(tWaterBox, FindMaterial("Copper"), "WaterBoxLogS");
+  auto tPhyWaterBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tLogWaterBoxC, "WaterBoxPhyC", tLogAlBoxC, false, 0, false);
+  auto tPhyWaterBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tLogWaterBoxS, "WaterBoxPhyS", tLogAlBoxS, false, 0, false);
 
-  // tLogSimpleBox->SetVisAttributes(fVisAttrOrange);
-  // tLogSimpleBox->SetVisAttributes(fVisAttrBlue);
-  // tLogSimpleBox->SetVisAttributes(fVisAttrGreen);
+  // Glass
+  auto tGlassBox = new G4Box("GlassBox", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm );
+  auto tLogGlassBox = new G4LogicalVolume(tGlassBox, FindMaterial("Copper"), "GlassBoxLog");
+  auto tPhyGlassBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(501.5,0.,0.), tLogGlassBox, "GlassBoxPhyC", tLogSimpleBoxC, false, 0, false);
+  auto tPhyGlassBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(501.5,0.,0.), tLogGlassBox, "GlassBoxPhyS", tLogSimpleBoxS, false, 0, false);
+  
+
+  tLogGlassBox->SetVisAttributes(fVisAttrGreen);
+  tLogWaterBoxC->SetVisAttributes(fVisAttrBlue);
+  tLogWaterBoxS->SetVisAttributes(fVisAttrOrange);
+  tLogAlBoxC->SetVisAttributes(fVisAttrGray);
+  tLogAlBoxS->SetVisAttributes(fVisAttrGray);
 
 
 
