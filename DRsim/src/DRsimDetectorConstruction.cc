@@ -159,10 +159,14 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
   auto tSimpleBox = new G4Box("SimpleBox", (1004. / 2.) *mm, (37.5 / 2.) *mm, (37.5 / 2.) *mm );
   auto tLogSimpleBoxC = new G4LogicalVolume(tSimpleBox, FindMaterial("Copper"), "SimpleBoxLogC");
   auto tLogSimpleBoxS = new G4LogicalVolume(tSimpleBox, FindMaterial("Copper"), "SimpleBoxLogS");
-  auto tPhySimpleBoxC1 = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.,18.75,-18.75), tLogSimpleBoxC, "SimpleBoxPhyC1", worldLogical, false, 0, false);
-  auto tPhySimpleBoxC2 = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.,-18.75,18.75), tLogSimpleBoxC, "SimpleBoxPhyC2", worldLogical, false, 0, false);
-  auto tPhySimpleBoxS1 = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.,18.75,18.75), tLogSimpleBoxS, "SimpleBoxPhyS1", worldLogical, false, 0, false);
-  auto tPhySimpleBoxS2 = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.,-18.75,-18.75), tLogSimpleBoxS, "SimpleBoxPhyS2", worldLogical, false, 0, false);
+  // auto tPhySimpleBoxC1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,18.75,-18.75), tLogSimpleBoxC, "SimpleBoxPhyC1", worldLogical, false, 0, false);
+  // auto tPhySimpleBoxC2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,-18.75,18.75), tLogSimpleBoxC, "SimpleBoxPhyC2", worldLogical, false, 0, false);
+  // auto tPhySimpleBoxS1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,18.75,18.75), tLogSimpleBoxS, "SimpleBoxPhyS1", worldLogical, false, 0, false);
+  // auto tPhySimpleBoxS2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,-18.75,-18.75), tLogSimpleBoxS, "SimpleBoxPhyS2", worldLogical, false, 0, false);
+  auto tPhySimpleBoxC1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(-18.75,-18.75,0.), tLogSimpleBoxC, "SimpleBoxPhyC1", worldLogical, false, 0, false);
+  auto tPhySimpleBoxC2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(18.75,18.75,0.), tLogSimpleBoxC, "SimpleBoxPhyC2", worldLogical, false, 0, false);
+  auto tPhySimpleBoxS1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(-18.75,18.75,0.), tLogSimpleBoxS, "SimpleBoxPhyS1", worldLogical, false, 0, false);
+  auto tPhySimpleBoxS2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(18.75,-18.75,0.), tLogSimpleBoxS, "SimpleBoxPhyS2", worldLogical, false, 0, false);
 
   // Al pipe
   auto tAlBox = new G4Box("AlBox", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm );
@@ -190,14 +194,6 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
   tLogWaterBoxS->SetVisAttributes(fVisAttrOrange);
   tLogAlBoxC->SetVisAttributes(fVisAttrGray);
   tLogAlBoxS->SetVisAttributes(fVisAttrGray);
-
-
-
-
-
-
-
-
 
 
 
