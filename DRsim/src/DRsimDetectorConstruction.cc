@@ -71,7 +71,15 @@ DRsimDetectorConstruction::DRsimDetectorConstruction()
   fVisAttrGray->SetVisibility(true);
   fVisAttrGreen = new G4VisAttributes(G4Colour(0.3,0.7,0.3));
   fVisAttrGreen->SetVisibility(true);
+  fVisAttrCyan = new G4VisAttributes(G4Colour(0.0, 1.0, 1.0));
+  fVisAttrCyan->SetVisibility(true);
+  fVisAttrYellow = new G4VisAttributes(G4Colour(1.0, 1.0, 0.0));
+  fVisAttrYellow->SetVisibility(true);
+  fVisAttrMagenta = new G4VisAttributes(G4Colour(1.0, 0.0, 1.0));
+  fVisAttrMagenta->SetVisibility(true);
 }
+
+
 
 DRsimDetectorConstruction::~DRsimDetectorConstruction() {
   delete fMessenger;
@@ -156,7 +164,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
                                             std::vector<DRsimInterface::DRsimModuleProperty>& ModuleProp_) {
 
   // Fe pipe
-  auto tSimpleBox = new G4Box("SimpleBox", (1004. / 2.) *mm, (37.5 / 2.) *mm, (37.5 / 2.) *mm );
+  auto tSimpleBox = new G4Box("SimpleBox", (1008. / 2.) *mm, (37.5 / 2.) *mm, (37.5 / 2.) *mm );
   auto tLogSimpleBoxC = new G4LogicalVolume(tSimpleBox, FindMaterial("Copper"), "SimpleBoxLogC");
   auto tLogSimpleBoxS = new G4LogicalVolume(tSimpleBox, FindMaterial("Copper"), "SimpleBoxLogS");
   // auto tPhySimpleBoxC1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,18.75,-18.75), tLogSimpleBoxC, "SimpleBoxPhyC1", worldLogical, false, 0, false);
@@ -172,8 +180,8 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
   auto tAlBox = new G4Box("AlBox", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm );
   auto tLogAlBoxC = new G4LogicalVolume(tAlBox, FindMaterial("Copper"), "AlBoxLogC");
   auto tLogAlBoxS = new G4LogicalVolume(tAlBox, FindMaterial("Copper"), "AlBoxLogS");
-  auto tPhyAlBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(2.5,0.,0.), tLogAlBoxC, "AlBoxPhyC", tLogSimpleBoxC, false, 0, false);
-  auto tPhyAlBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(2.5,0.,0.), tLogAlBoxS, "AlBoxPhyS", tLogSimpleBoxS, false, 0, false);
+  auto tPhyAlBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.5,0.,0.), tLogAlBoxC, "AlBoxPhyC", tLogSimpleBoxC, false, 0, false);
+  auto tPhyAlBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.5,0.,0.), tLogAlBoxS, "AlBoxPhyS", tLogSimpleBoxS, false, 0, false);
 
   // Water 
   auto tWaterBox = new G4Box("WaterBox", (996.75 / 2.) *mm, (25. / 2.) *mm, (25. / 2.) *mm );
@@ -183,13 +191,13 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
   auto tPhyWaterBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tLogWaterBoxS, "WaterBoxPhyS", tLogAlBoxS, false, 0, false);
 
   // Glass
-  auto tGlassBox = new G4Box("GlassBox", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm );
+  auto tGlassBox = new G4Box("GlassBox", (5. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm );
   auto tLogGlassBox = new G4LogicalVolume(tGlassBox, FindMaterial("Copper"), "GlassBoxLog");
   auto tPhyGlassBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(501.5,0.,0.), tLogGlassBox, "GlassBoxPhyC", tLogSimpleBoxC, false, 0, false);
   auto tPhyGlassBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(501.5,0.,0.), tLogGlassBox, "GlassBoxPhyS", tLogSimpleBoxS, false, 0, false);
   
 
-  tLogGlassBox->SetVisAttributes(fVisAttrGreen);
+  tLogGlassBox->SetVisAttributes(fVisAttrCyan);
   tLogWaterBoxC->SetVisAttributes(fVisAttrBlue);
   tLogWaterBoxS->SetVisAttributes(fVisAttrOrange);
   tLogAlBoxC->SetVisAttributes(fVisAttrGray);
