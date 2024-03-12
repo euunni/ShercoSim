@@ -59,6 +59,33 @@ void DRsimMaterials::CreateMaterials() {
   G4Element* O  = new G4Element("Oxygen"  ,symbol="O" , z=8., a=16.00*g/mole);
   G4Element* F  = new G4Element("Fluorine",symbol="F" , z=9., a=18.9984*g/mole);
 
+  // LS
+  fLAB = new G4Material("LAB", density=0.863*g/cm3, 4, kStateLiquid);
+  fLAB->AddElement(C, 6);
+  fLAB->AddElement(H, 5);
+  fLAB->AddElement(C, 12);
+  fLAB->AddElement(H, 25);
+
+  fPPO = new G4Material("PPO", density=1.094*g/cm3, 4, kStateLiquid);
+  fPPO->AddElement(C, 15);
+  fPPO->AddElement(H, 11);
+  fPPO->AddElement(N, 1);
+  fPPO->AddElement(O, 1);
+
+  fBisMSB = new G4Material("BisMSB", density=1.3*g/cm3, 2, kStateLiquid);
+  fBisMSB->AddElement(C, 24);
+  fBisMSB->AddElement(H, 22);
+
+  fLS = new G4Material("LS", density=0.865*g/cm3, 3, kStateLiquid);
+  fLS->AddMaterial(fLAB, 99.697*perCent);
+  fLS->AddMaterial(fPPO, 0.3*perCent);
+  fLS->AddMaterial(fBisMSB, 0.003*perCent);
+
+  // Water
+  fWater = new G4Material("Water", density=1*g/cm3, 2, kStateLiquid);
+  fWater->AddElement(H, 2);
+  fWater->AddElement(O, 1);  
+
   fCu = new G4Material("Copper"  , z = 29., a = 63.546 * g/mole, density = 8.96  * g/cm3);
   fW  = new G4Material("Tungsten", z = 74., a = 183.84 * g/mole, density = 19.30 * g/cm3);
   fFe = new G4Material("Iron"    , z = 26., a = 55.845 * g/mole, density = 7.874 * g/cm3);

@@ -89,6 +89,9 @@ DRsimDetectorConstruction::~DRsimDetectorConstruction() {
   delete fVisAttrBlue;
   delete fVisAttrGray;
   delete fVisAttrGreen;
+  delete fVisAttrCyan;
+  delete fVisAttrYellow;
+  delete fVisAttrMagenta;
 }
 
 void DRsimDetectorConstruction::DefineMaterials() {
@@ -164,48 +167,58 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
                                             std::vector<DRsimInterface::DRsimModuleProperty>& ModuleProp_) {
 
   // Fe pipe
-  auto tSimpleBox = new G4Box("SimpleBox", (1008. / 2.) *mm, (37.5 / 2.) *mm, (37.5 / 2.) *mm );
-  auto tLogSimpleBoxC = new G4LogicalVolume(tSimpleBox, FindMaterial("Copper"), "SimpleBoxLogC");
-  auto tLogSimpleBoxS = new G4LogicalVolume(tSimpleBox, FindMaterial("Copper"), "SimpleBoxLogS");
+  auto tSimpleBox = new G4Box("SimpleBox", (1008. / 2.) *mm, (37.5 / 2.) *mm, (37.5 / 2.) *mm);
+  auto tLogSimpleBoxC = new G4LogicalVolume(tSimpleBox, FindMaterial("Iron"), "SimpleBoxLogC");
+  auto tLogSimpleBoxS = new G4LogicalVolume(tSimpleBox, FindMaterial("Iron"), "SimpleBoxLogS");
   // auto tPhySimpleBoxC1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,18.75,-18.75), tLogSimpleBoxC, "SimpleBoxPhyC1", worldLogical, false, 0, false);
   // auto tPhySimpleBoxC2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,-18.75,18.75), tLogSimpleBoxC, "SimpleBoxPhyC2", worldLogical, false, 0, false);
   // auto tPhySimpleBoxS1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,18.75,18.75), tLogSimpleBoxS, "SimpleBoxPhyS1", worldLogical, false, 0, false);
   // auto tPhySimpleBoxS2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,-18.75,-18.75), tLogSimpleBoxS, "SimpleBoxPhyS2", worldLogical, false, 0, false);
-  auto tPhySimpleBoxC1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(-18.75,-18.75,0.), tLogSimpleBoxC, "SimpleBoxPhyC1", worldLogical, false, 0, false);
-  auto tPhySimpleBoxC2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(18.75,18.75,0.), tLogSimpleBoxC, "SimpleBoxPhyC2", worldLogical, false, 0, false);
-  auto tPhySimpleBoxS1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(-18.75,18.75,0.), tLogSimpleBoxS, "SimpleBoxPhyS1", worldLogical, false, 0, false);
-  auto tPhySimpleBoxS2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(18.75,-18.75,0.), tLogSimpleBoxS, "SimpleBoxPhyS2", worldLogical, false, 0, false);
+  auto tPhySimpleBoxC1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(-18.75,-18.75,0.), tLogSimpleBoxC, "SimpleBoxPhyC", worldLogical, true, 0, false);
+  auto tPhySimpleBoxC2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(18.75,18.75,0.), tLogSimpleBoxC, "SimpleBoxPhyC", worldLogical, true, 1, false);
+  auto tPhySimpleBoxS1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(-18.75,18.75,0.), tLogSimpleBoxS, "SimpleBoxPhyS", worldLogical, true, 0, false);
+  auto tPhySimpleBoxS2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(18.75,-18.75,0.), tLogSimpleBoxS, "SimpleBoxPhyS", worldLogical, true, 1, false);
 
   // Al pipe
-  auto tAlBox = new G4Box("AlBox", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm );
-  auto tLogAlBoxC = new G4LogicalVolume(tAlBox, FindMaterial("Copper"), "AlBoxLogC");
-  auto tLogAlBoxS = new G4LogicalVolume(tAlBox, FindMaterial("Copper"), "AlBoxLogS");
+  auto tAlBox = new G4Box("AlBox", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
+  auto tLogAlBoxC = new G4LogicalVolume(tAlBox, FindMaterial("Aluminum"), "AlBoxLogC");
+  auto tLogAlBoxS = new G4LogicalVolume(tAlBox, FindMaterial("Aluminum"), "AlBoxLogS");
   auto tPhyAlBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.5,0.,0.), tLogAlBoxC, "AlBoxPhyC", tLogSimpleBoxC, false, 0, false);
   auto tPhyAlBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.5,0.,0.), tLogAlBoxS, "AlBoxPhyS", tLogSimpleBoxS, false, 0, false);
 
   // Water 
-  auto tWaterBox = new G4Box("WaterBox", (996.75 / 2.) *mm, (25. / 2.) *mm, (25. / 2.) *mm );
-  auto tLogWaterBoxC = new G4LogicalVolume(tWaterBox, FindMaterial("Copper"), "WaterBoxLogC");
-  auto tLogWaterBoxS = new G4LogicalVolume(tWaterBox, FindMaterial("Copper"), "WaterBoxLogS");
+  auto tWaterBox = new G4Box("WaterBox", (996.75 / 2.) *mm, (25. / 2.) *mm, (25. / 2.) *mm);
+  auto tLogWaterBoxC = new G4LogicalVolume(tWaterBox, FindMaterial("Water"), "WaterBoxLogC");
+  auto tLogWaterBoxS = new G4LogicalVolume(tWaterBox, FindMaterial("LS"), "WaterBoxLogS");
   auto tPhyWaterBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tLogWaterBoxC, "WaterBoxPhyC", tLogAlBoxC, false, 0, false);
   auto tPhyWaterBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tLogWaterBoxS, "WaterBoxPhyS", tLogAlBoxS, false, 0, false);
 
   // Glass
-  auto tGlassBox = new G4Box("GlassBox", (5. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm );
-  auto tLogGlassBox = new G4LogicalVolume(tGlassBox, FindMaterial("Copper"), "GlassBoxLog");
-  auto tPhyGlassBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(501.5,0.,0.), tLogGlassBox, "GlassBoxPhyC", tLogSimpleBoxC, false, 0, false);
-  auto tPhyGlassBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(501.5,0.,0.), tLogGlassBox, "GlassBoxPhyS", tLogSimpleBoxS, false, 0, false);
+  auto tGlassBox = new G4Box("GlassBox", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
+  auto tLogGlassBox = new G4LogicalVolume(tGlassBox, FindMaterial("Glass"), "GlassBoxLog");
+  auto tPhyGlassBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(499.5,0.,0.), tLogGlassBox, "GlassBoxPhyC", tLogSimpleBoxC, false, 0, false);
+  auto tPhyGlassBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(499.5,0.,0.), tLogGlassBox, "GlassBoxPhyS", tLogSimpleBoxS, false, 0, false);
   
+  // Optical Cookie
+  auto tOpCookieBox = new G4Box("OpCookieBox", (3. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
+  auto tLogOpCookieBox = new G4LogicalVolume(tOpCookieBox, FindMaterial("Gelatin"), "OpCookieBoxLog");
+  auto tPhyOpCookieBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(501.5,0.,0.), tLogOpCookieBox, "OpCookieBoxPhyC", tLogSimpleBoxC, false, 0, false);
+  auto tPhyOpCookieBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(501.5,0.,0.), tLogOpCookieBox, "OpCookieBoxPhyS", tLogSimpleBoxS, false, 0, false);
+
+  // Detector
+  auto tDetectorBox = new G4Box("DetectorBox", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
+  auto tLogDetectorBox = new G4LogicalVolume(tDetectorBox, FindMaterial("Silicon"), "DetectorBoxLog");
+  auto tPhyDetectorBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(503.5,0.,0.), tLogDetectorBox, "DetectorBoxPhyC", tLogSimpleBoxC, false, 0, false);
+  auto tPhyDetectorBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(503.5,0.,0.), tLogDetectorBox, "DetectorBoxPhyS", tLogSimpleBoxS, false, 0, false);
 
   tLogGlassBox->SetVisAttributes(fVisAttrCyan);
   tLogWaterBoxC->SetVisAttributes(fVisAttrBlue);
   tLogWaterBoxS->SetVisAttributes(fVisAttrOrange);
   tLogAlBoxC->SetVisAttributes(fVisAttrGray);
   tLogAlBoxS->SetVisAttributes(fVisAttrGray);
-
-
-
-
+  tLogOpCookieBox->SetVisAttributes(fVisAttrYellow);
+  tLogDetectorBox->SetVisAttributes(fVisAttrGreen);
+  
 
   // for (int i = 0; i < fNofModules; i++) {    
   //   moduleName = setModuleName(i);
@@ -267,21 +280,21 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
   //     PMTfilterLogical_[i]->SetVisAttributes(fVisAttrOrange);
   //   }
 
-  //   if ( doReflector ) {
-  //     G4VSolid* ReflectorlayerSolid = new G4Box("ReflectorlayerSolid", (fModuleH/2.) *mm, (fModuleW/2.) *mm, (reflectorT/2.) *mm );
-  //     G4LogicalVolume* ReflectorlayerLogical = new G4LogicalVolume(ReflectorlayerSolid,FindMaterial("G4_Galactic"),"ReflectorlayerLogical");
-  //     new G4PVPlacement(0,dimCalc->GetOrigin_Reflector(i),ReflectorlayerLogical,"ReflectorlayerPhysical",worldLogical,false,0,checkOverlaps);
+    // if ( doReflector ) {
+    //   G4VSolid* ReflectorlayerSolid = new G4Box("ReflectorlayerSolid", (fModuleH/2.) *mm, (fModuleW/2.) *mm, (reflectorT/2.) *mm );
+    //   G4LogicalVolume* ReflectorlayerLogical = new G4LogicalVolume(ReflectorlayerSolid,FindMaterial("G4_Galactic"),"ReflectorlayerLogical");
+    //   new G4PVPlacement(0,dimCalc->GetOrigin_Reflector(i),ReflectorlayerLogical,"ReflectorlayerPhysical",worldLogical,false,0,checkOverlaps);
 
-  //     G4VSolid* mirrorSolid = new G4Box("mirrorSolid", 1.2/2. *mm, 1.2/2. *mm, reflectorT/2. *mm );
-  //     ReflectorMirrorLogical_[i] = new G4LogicalVolume(mirrorSolid,FindMaterial("Aluminum"),"ReflectorMirrorLogical_");
+    //   G4VSolid* mirrorSolid = new G4Box("mirrorSolid", 1.2/2. *mm, 1.2/2. *mm, reflectorT/2. *mm );
+    //   ReflectorMirrorLogical_[i] = new G4LogicalVolume(mirrorSolid,FindMaterial("Aluminum"),"ReflectorMirrorLogical_");
 
-  //     // DRsimMirrorParameterisation* mirrorParam = new DRsimMirrorParameterisation(fTowerXY.first,fTowerXY.second);
-  //     DRsimMirrorParameterisation* mirrorParam = new DRsimMirrorParameterisation(fFiberX, fFiberY, fFiberWhich);
-  //     G4PVParameterised* mirrorPhysical = new G4PVParameterised("mirrorPhysical",ReflectorMirrorLogical_[i],ReflectorlayerLogical,kXAxis,fTowerXY.first*fTowerXY.second/2,mirrorParam);
-  //     // new G4LogicalBorderSurface("MirrorSurf",mirrorPhysical,modulePhysical,FindSurface("MirrorSurf"));
-  //     new G4LogicalSkinSurface("MirrorSurf",ReflectorMirrorLogical_[i],FindSurface("MirrorSurf"));
+    //   // DRsimMirrorParameterisation* mirrorParam = new DRsimMirrorParameterisation(fTowerXY.first,fTowerXY.second);
+    //   DRsimMirrorParameterisation* mirrorParam = new DRsimMirrorParameterisation(fFiberX, fFiberY, fFiberWhich);
+    //   G4PVParameterised* mirrorPhysical = new G4PVParameterised("mirrorPhysical",ReflectorMirrorLogical_[i],ReflectorlayerLogical,kXAxis,fTowerXY.first*fTowerXY.second/2,mirrorParam);
+    //   // new G4LogicalBorderSurface("MirrorSurf",mirrorPhysical,modulePhysical,FindSurface("MirrorSurf"));
+    //   new G4LogicalSkinSurface("MirrorSurf",ReflectorMirrorLogical_[i],FindSurface("MirrorSurf"));
 
-  //     ReflectorMirrorLogical_[i]->SetVisAttributes(fVisAttrGray);
+    //   ReflectorMirrorLogical_[i]->SetVisAttributes(fVisAttrGray);
   //   }
   // }
 }
