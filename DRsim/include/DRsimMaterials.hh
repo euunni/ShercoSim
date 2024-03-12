@@ -33,6 +33,11 @@ private:
   G4Material* fGelatin;
   G4Material* fMirror;
   G4Material* fBlackpaint;
+  G4Material* fLAB;
+  G4Material* fPPO;
+  G4Material* fBisMSB;
+  G4Material* fLS;
+  G4Material* fWater;
   G4OpticalSurface* fSiPMSurf;
   G4OpticalSurface* fFilterSurf;
   G4OpticalSurface* fMirrorSurf;
