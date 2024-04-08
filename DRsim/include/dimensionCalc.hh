@@ -19,6 +19,7 @@ public:
 
   void SetNofModules(G4int NofMondules) { fNofModules = NofMondules; }
   void SetNofRow(G4int NofRow) { fNofRow = NofRow; }
+  void SetNofCol(G4int NofCol) { fNofCol = NofCol; }
   void SetFrontL(G4double frontL) { fFrontL = frontL; }
   void SetTower_height(G4double tower_height) { ftower_height = tower_height; }
   void SetPMTT(G4double PMTT) { fPMTT = PMTT; }
@@ -42,6 +43,7 @@ private:
 
   G4int fNofModules;
   G4int fNofRow;
+  G4int fNofCol;
   G4double ftower_front;
   G4double ftower_height;
   G4double fFrontL;
