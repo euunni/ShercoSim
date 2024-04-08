@@ -16,6 +16,7 @@ dimensionCalc::dimensionCalc() {
   fFrontL       = 0;
   fNofModules   = 0;
   fNofRow       = 0;
+  fNofCol       = 0;
   ftower_height = 0;
   fModuleHeight = 0;
   fModuleWidth  = 0;
@@ -32,9 +33,15 @@ G4ThreeVector dimensionCalc::GetOrigin(G4int i) {
   double row = i/fNofRow;
   double col = i%fNofRow;
 
-  return G4ThreeVector( 
-                        -fModuleHeight * (double)fNofRow/2. + row * fModuleHeight + fModuleHeight/2., 
-                        -fModuleWidth  * (double)fNofRow/2. + col * fModuleWidth  + fModuleWidth/2., 
+  // return G4ThreeVector( 
+  //                       -fModuleHeight * (double)fNofRow/2. + row * fModuleHeight + fModuleHeight/2., 
+  //                       -fModuleWidth  * (double)fNofRow/2. + col * fModuleWidth  + fModuleWidth/2., 
+  //                       ftower_height/2. + fFrontL
+  //                     );
+
+  return G4ThreeVector( // for rotation with 90 deg on z-axis 
+                        -fModuleWidth  * (double)fNofRow/2. + col * fModuleWidth  + fModuleWidth/2.,
+                        -fModuleHeight * (double)fNofCol/2. + row * fModuleHeight + fModuleHeight/2., 
                         ftower_height/2. + fFrontL
                       );
 }

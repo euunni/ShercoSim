@@ -27,8 +27,9 @@ using namespace std;
 G4ThreadLocal DRsimMagneticField* DRsimDetectorConstruction::fMagneticField = 0;
 G4ThreadLocal G4FieldManager* DRsimDetectorConstruction::fFieldMgr = 0;
 
-int DRsimDetectorConstruction::fNofRow = 1;
-int DRsimDetectorConstruction::fNofModules = fNofRow * fNofRow;
+int DRsimDetectorConstruction::fNofRow = 5;
+int DRsimDetectorConstruction::fNofCol = 4;
+int DRsimDetectorConstruction::fNofModules = fNofRow * fNofCol;
 
 DRsimDetectorConstruction::DRsimDetectorConstruction()
 : G4VUserDetectorConstruction(), fMessenger(0), fMaterials(NULL) {
@@ -110,7 +111,7 @@ G4VPhysicalVolume* DRsimDetectorConstruction::Construct() {
   worldLogical                     = new G4LogicalVolume(worldSolid,FindMaterial("G4_Galactic"),"worldLogical");
   G4VPhysicalVolume* worldPhysical = new G4PVPlacement(0,G4ThreeVector(),worldLogical,"worldPhysical",0,false,0,checkOverlaps);
 
-  float moduleUnitDimension = 122.;
+  float moduleUnitDimension = 37.5;
 
   fFrontL     = 0.;
   fTowerDepth = 100.; 
@@ -137,6 +138,7 @@ G4VPhysicalVolume* DRsimDetectorConstruction::Construct() {
   dimCalc->SetReflectorT(reflectorT);
   dimCalc->SetNofModules(fNofModules);
   dimCalc->SetNofRow(fNofRow);
+  dimCalc->SetNofCol(fNofCol);
   dimCalc->SetModuleHeight(fModuleH);
   dimCalc->SetModuleWidth(fModuleW);
 
@@ -165,19 +167,33 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
                                             G4LogicalVolume* ReflectorMirrorLogical_[],
                                             std::vector<G4LogicalVolume*> fiberUnitIntersection_[], std::vector<G4LogicalVolume*> fiberCladIntersection_[], std::vector<G4LogicalVolume*> fiberCoreIntersection_[], 
                                             std::vector<DRsimInterface::DRsimModuleProperty>& ModuleProp_) {
-
+  
   // Fe pipe
   auto tSimpleBox = new G4Box("SimpleBox", (1008. / 2.) *mm, (37.5 / 2.) *mm, (37.5 / 2.) *mm);
   auto tLogSimpleBoxC = new G4LogicalVolume(tSimpleBox, FindMaterial("Iron"), "SimpleBoxLogC");
   auto tLogSimpleBoxS = new G4LogicalVolume(tSimpleBox, FindMaterial("Iron"), "SimpleBoxLogS");
-  // auto tPhySimpleBoxC1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,18.75,-18.75), tLogSimpleBoxC, "SimpleBoxPhyC1", worldLogical, false, 0, false);
-  // auto tPhySimpleBoxC2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,-18.75,18.75), tLogSimpleBoxC, "SimpleBoxPhyC2", worldLogical, false, 0, false);
-  // auto tPhySimpleBoxS1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,18.75,18.75), tLogSimpleBoxS, "SimpleBoxPhyS1", worldLogical, false, 0, false);
-  // auto tPhySimpleBoxS2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(0.,-18.75,-18.75), tLogSimpleBoxS, "SimpleBoxPhyS2", worldLogical, false, 0, false);
-  auto tPhySimpleBoxC1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(-18.75,-18.75,0.), tLogSimpleBoxC, "SimpleBoxPhyC", worldLogical, true, 0, false);
-  auto tPhySimpleBoxC2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(18.75,18.75,0.), tLogSimpleBoxC, "SimpleBoxPhyC", worldLogical, true, 1, false);
-  auto tPhySimpleBoxS1 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(-18.75,18.75,0.), tLogSimpleBoxS, "SimpleBoxPhyS", worldLogical, true, 0, false);
-  auto tPhySimpleBoxS2 = new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), G4ThreeVector(18.75,-18.75,0.), tLogSimpleBoxS, "SimpleBoxPhyS", worldLogical, true, 1, false);
+
+  std::vector<G4PVPlacement*> tPhySimpleBoxC;
+  std::vector<G4PVPlacement*> tPhySimpleBoxS;
+
+  int fNrow = 5;
+  int fNcol = 4;
+
+  for ( int row = 0; row < fNrow; row++ ) {
+    for ( int col = 0; col < fNcol; col++ ) {
+
+      int fNmodule = row + col * fNrow; // 0 ~ 19
+      bool isCeren = fNmodule % 2 == 0 ? true : false;
+
+      if ( isCeren == true ) {
+        tPhySimpleBoxC.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(fNmodule), tLogSimpleBoxC, "SimpleBoxPhyC", worldLogical, true, fNmodule, false));
+      }
+
+      else {
+        tPhySimpleBoxS.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(fNmodule), tLogSimpleBoxS, "SimpleBoxPhyS", worldLogical, true, fNmodule, false));
+      } 
+    }
+  }
 
   // Al pipe
   auto tAlBox = new G4Box("AlBox", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
@@ -218,7 +234,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
   tLogAlBoxS->SetVisAttributes(fVisAttrGray);
   tLogOpCookieBox->SetVisAttributes(fVisAttrYellow);
   tLogDetectorBox->SetVisAttributes(fVisAttrGreen);
-  
+
 
   // for (int i = 0; i < fNofModules; i++) {    
   //   moduleName = setModuleName(i);
@@ -236,12 +252,12 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
   //     new G4PVPlacement(0,dimCalc->GetOrigin_PMTG(i),PMTGLogical_[i],moduleName,worldLogical,false,0,checkOverlaps);
   //   }
 
-  //   FiberImplement(i,ModuleLogical_,fiberUnitIntersection_,fiberCladIntersection_,fiberCoreIntersection_);
+  //   FiberImplement(i,,fiberUnitIntersection_,fiberCladIntersection_,fiberCoreIntersection_);
 
   //   DRsimInterface::DRsimModuleProperty ModulePropSingle;
   //   ModulePropSingle.towerXY   = fTowerXY;
   //   ModulePropSingle.ModuleNum = i;
-  //   ModuleProp_.push_back(ModulePropSingle);
+  //   ModuleProp_.push_back(ModulePropSingle);ModuleLogical_
 
   //   if ( doPMT ) {
   //     G4VSolid* SiPMlayerSolid = new G4Box("SiPMlayerSolid", (fModuleH/2.) *mm, (fModuleW/2.) *mm, (PMTT/2.) *mm );
