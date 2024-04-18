@@ -175,7 +175,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
   std::vector<G4PVPlacement*> tModulePhyVec;
 
   for ( int nModule = 0; nModule < fNofModules; nModule++ ) {
-    bool isCeren = RecoInterface::IsCerenkov(fNmodule);
+    bool isCeren = DRsimInterface::IsCerenkov(nModule);
     
     DRsimInterface::DRsimModuleProperty ModulePropSingle;
     ModulePropSingle.towerXY   = std::make_pair(1, 1);
@@ -188,7 +188,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       auto tModuleLog = new G4LogicalVolume(tModule, FindMaterial("Iron"), "Module_" + std::to_string(nModule));
       
       auto tAlHousing = new G4Box("tAlHousing", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
-      auto tAlHousingLog = new G4LogicalVolume(tAlBox, FindMaterial("Aluminum"), "tAlHousingLog");
+      auto tAlHousingLog = new G4LogicalVolume(tAlHousing, FindMaterial("Aluminum"), "tAlHousingLog");
       auto tAlHousingPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.5,0.,0.), tAlHousingLog, "tAlHousingPhy", tModuleLog, false, 0, false);
 
       auto tActiveMat = new G4Box("tActiveMat", (996.75 / 2.) *mm, (25. / 2.) *mm, (25. / 2.) *mm);
@@ -209,9 +209,9 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       PMTcathLogical_[nModule] = new G4LogicalVolume(tPMT, FindMaterial("Silicon"), "tPMTLog");
       auto tPMTPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(503.5,0.,0.), PMTcathLogical_[nModule], "tPMTPhy", tModuleLog, false, 0, false);
       
-      new G4LogicalSkinSurface("PMT_surf", tPMTLog, FindSurface("PMT_surf"));
+      new G4LogicalSkinSurface("PMT_surf", PMTcathLogical_[nModule], FindSurface("PMT_surf"));
       
-      tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "tModulePhy", worldLogical, true, fNmodule, false));
+      tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "tModulePhy", worldLogical, true, nModule, false));
       
       tActiveMatLog->SetVisAttributes(fVisAttrBlue);
       tPMTGlassLog->SetVisAttributes(fVisAttrCyan);
@@ -224,7 +224,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       auto tModuleLog = new G4LogicalVolume(tModule, FindMaterial("Iron"), "Module_" + std::to_string(nModule));
       
       auto tAlHousing = new G4Box("tAlHousing", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
-      auto tAlHousingLog = new G4LogicalVolume(tAlBox, FindMaterial("Aluminum"), "tAlHousingLog");
+      auto tAlHousingLog = new G4LogicalVolume(tAlHousing, FindMaterial("Aluminum"), "tAlHousingLog");
       auto tAlHousingPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.5,0.,0.), tAlHousingLog, "tAlHousingPhy", tModuleLog, false, 0, false);
 
       auto tActiveMat = new G4Box("tActiveMat", (996.75 / 2.) *mm, (25. / 2.) *mm, (25. / 2.) *mm);
@@ -245,9 +245,9 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       PMTcathLogical_[nModule] = new G4LogicalVolume(tPMT, FindMaterial("Silicon"), "tPMTLog");
       auto tPMTPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(503.5,0.,0.), PMTcathLogical_[nModule], "tPMTPhy", tModuleLog, false, 0, false);
 
-      new G4LogicalSkinSurface("PMT_surf", tPMTLog, FindSurface("PMT_surf"));
+      new G4LogicalSkinSurface("PMT_surf", PMTcathLogical_[nModule], FindSurface("PMT_surf"));
       
-      tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "tModulePhy", worldLogical, true, fNmodule, false));    
+      tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "tModulePhy", worldLogical, true, nModule, false));    
       
       tActiveMatLog->SetVisAttributes(fVisAttrOrange);
       tPMTGlassLog->SetVisAttributes(fVisAttrCyan);
