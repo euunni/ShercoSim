@@ -153,87 +153,109 @@ void DRsimDetectorConstruction::ConstructSDandField() {
   G4String SiPMName = "SiPMSD";
 
   // ! Not a memory leak - SDs are deleted by G4SDManager. Deleting them manually will cause double delete!
-  // if ( doPMT ) {
-  //   for (int i = 0; i < fNofModules; i++) {
-  //     DRsimSiPMSD* SiPMSDmodule = new DRsimSiPMSD("Module"+std::to_string(i), "ModuleC"+std::to_string(i), fModuleProp.at(i));
-  //     SDman->AddNewDetector(SiPMSDmodule);
-  //     PMTcathLogical[i]->SetSensitiveDetector(SiPMSDmodule);
-  //   }
-  // }
+  for (int i = 0; i < fNofModules; i++) {
+    DRsimSiPMSD* SiPMSDmodule = new DRsimSiPMSD("Module_"+std::to_string(i), "ModuleHC_"+std::to_string(i), fModuleProp.at(i));
+    SDman->AddNewDetector(SiPMSDmodule);
+    PMTcathLogical[i]->SetSensitiveDetector(SiPMSDmodule);
+  }
 }
 
 void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[], 
-                                            G4LogicalVolume* PMTGLogical_[], G4LogicalVolume* PMTfilterLogical_[], G4LogicalVolume* PMTcellLogical_[], G4LogicalVolume* PMTcathLogical_[], 
+                                            G4LogicalVolume* PMTGLogical_[], 
+                                            G4LogicalVolume* PMTfilterLogical_[], 
+                                            G4LogicalVolume* PMTcellLogical_[], 
+                                            G4LogicalVolume* PMTcathLogical_[], 
                                             G4LogicalVolume* ReflectorMirrorLogical_[],
-                                            std::vector<G4LogicalVolume*> fiberUnitIntersection_[], std::vector<G4LogicalVolume*> fiberCladIntersection_[], std::vector<G4LogicalVolume*> fiberCoreIntersection_[], 
+                                            std::vector<G4LogicalVolume*> fiberUnitIntersection_[], 
+                                            std::vector<G4LogicalVolume*> fiberCladIntersection_[], 
+                                            std::vector<G4LogicalVolume*> fiberCoreIntersection_[], 
                                             std::vector<DRsimInterface::DRsimModuleProperty>& ModuleProp_) {
   
-  // Fe pipe
-  auto tSimpleBox = new G4Box("SimpleBox", (1008. / 2.) *mm, (37.5 / 2.) *mm, (37.5 / 2.) *mm);
-  auto tLogSimpleBoxC = new G4LogicalVolume(tSimpleBox, FindMaterial("Iron"), "SimpleBoxLogC");
-  auto tLogSimpleBoxS = new G4LogicalVolume(tSimpleBox, FindMaterial("Iron"), "SimpleBoxLogS");
 
-  std::vector<G4PVPlacement*> tPhySimpleBoxC;
-  std::vector<G4PVPlacement*> tPhySimpleBoxS;
+  std::vector<G4PVPlacement*> tModulePhyVec;
 
-  int fNrow = 5;
-  int fNcol = 4;
+  for ( int nModule = 0; nModule < fNofModules; nModule++ ) {
+    bool isCeren = RecoInterface::IsCerenkov(fNmodule);
+    
+    DRsimInterface::DRsimModuleProperty ModulePropSingle;
+    ModulePropSingle.towerXY   = std::make_pair(1, 1);
+    ModulePropSingle.ModuleNum = nModule;
+    ModuleProp_.push_back(ModulePropSingle);
 
-  for ( int row = 0; row < fNrow; row++ ) {
-    for ( int col = 0; col < fNcol; col++ ) {
+    if ( isCeren == true ) {
+      
+      auto tModule = new G4Box("Module", (1008. / 2.) *mm, (37.5 / 2.) *mm, (37.5 / 2.) *mm);
+      auto tModuleLog = new G4LogicalVolume(tModule, FindMaterial("Iron"), "Module_" + std::to_string(nModule));
+      
+      auto tAlHousing = new G4Box("tAlHousing", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
+      auto tAlHousingLog = new G4LogicalVolume(tAlBox, FindMaterial("Aluminum"), "tAlHousingLog");
+      auto tAlHousingPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.5,0.,0.), tAlHousingLog, "tAlHousingPhy", tModuleLog, false, 0, false);
 
-      int fNmodule = row + col * fNrow; // 0 ~ 19
-      bool isCeren = fNmodule % 2 == 0 ? true : false;
+      auto tActiveMat = new G4Box("tActiveMat", (996.75 / 2.) *mm, (25. / 2.) *mm, (25. / 2.) *mm);
+      auto tActiveMatLog = new G4LogicalVolume(tActiveMat, FindMaterial("Water"), "tActiveMatLog");
+      auto tActiveMatPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tActiveMatLog, "tActiveMatPhy", tAlHousingLog, false, 0, false);
+      
+      new G4LogicalSkinSurface("AL_surf", tActiveMatLog, FindSurface("AL_surf"));
+      
+      auto tPMTGlass = new G4Box("tPMTGlass", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
+      auto tPMTGlassLog = new G4LogicalVolume(tPMTGlass, FindMaterial("Glass"), "tPMTGlassLog");
+      auto tPMTGlassPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(499.5,0.,0.), tPMTGlassLog, "tPMTGlassPhy", tModuleLog, false, 0, false);
+    
+      auto tOpCookie = new G4Box("tOpCookie", (3. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
+      auto tOpCookieLog = new G4LogicalVolume(tOpCookie, FindMaterial("Gelatin"), "tOpCookieLog");
+      auto tOpCookiePhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(501.5,0.,0.), tOpCookieLog, "tOpCookiePhy", tModuleLog, false, 0, false);
+    
+      auto tPMT = new G4Box("tPMT", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
+      PMTcathLogical_[nModule] = new G4LogicalVolume(tPMT, FindMaterial("Silicon"), "tPMTLog");
+      auto tPMTPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(503.5,0.,0.), PMTcathLogical_[nModule], "tPMTPhy", tModuleLog, false, 0, false);
+      
+      new G4LogicalSkinSurface("PMT_surf", tPMTLog, FindSurface("PMT_surf"));
+      
+      tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "tModulePhy", worldLogical, true, fNmodule, false));
+      
+      tActiveMatLog->SetVisAttributes(fVisAttrBlue);
+      tPMTGlassLog->SetVisAttributes(fVisAttrCyan);
+      tAlHousingLog->SetVisAttributes(fVisAttrGray);
+      tOpCookieLog->SetVisAttributes(fVisAttrYellow);
+      PMTcathLogical_[nModule]->SetVisAttributes(fVisAttrGreen); 
+    } else {
+      
+      auto tModule = new G4Box("Module", (1008. / 2.) *mm, (37.5 / 2.) *mm, (37.5 / 2.) *mm);
+      auto tModuleLog = new G4LogicalVolume(tModule, FindMaterial("Iron"), "Module_" + std::to_string(nModule));
+      
+      auto tAlHousing = new G4Box("tAlHousing", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
+      auto tAlHousingLog = new G4LogicalVolume(tAlBox, FindMaterial("Aluminum"), "tAlHousingLog");
+      auto tAlHousingPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.5,0.,0.), tAlHousingLog, "tAlHousingPhy", tModuleLog, false, 0, false);
 
-      if ( isCeren == true ) {
-        tPhySimpleBoxC.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(fNmodule), tLogSimpleBoxC, "SimpleBoxPhyC", worldLogical, true, fNmodule, false));
-      }
+      auto tActiveMat = new G4Box("tActiveMat", (996.75 / 2.) *mm, (25. / 2.) *mm, (25. / 2.) *mm);
+      auto tActiveMatLog = new G4LogicalVolume(tActiveMat, FindMaterial("LS"), "tActiveMatLog");
+      auto tActiveMatPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tActiveMatLog, "tActiveMatPhy", tAlHousingLog, false, 0, false);
+      
+      new G4LogicalSkinSurface("AL_surf", tActiveMatLog, FindSurface("AL_surf"));
+      
+      auto tPMTGlass = new G4Box("tPMTGlass", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
+      auto tPMTGlassLog = new G4LogicalVolume(tPMTGlass, FindMaterial("Glass"), "tPMTGlassLog");
+      auto tPMTGlassPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(499.5,0.,0.), tPMTGlassLog, "tPMTGlassPhy", tModuleLog, false, 0, false);
+    
+      auto tOpCookie = new G4Box("tOpCookie", (3. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
+      auto tOpCookieLog = new G4LogicalVolume(tOpCookie, FindMaterial("Gelatin"), "tOpCookieLog");
+      auto tOpCookiePhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(501.5,0.,0.), tOpCookieLog, "tOpCookiePhy", tModuleLog, false, 0, false);
+    
+      auto tPMT = new G4Box("tPMT", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
+      PMTcathLogical_[nModule] = new G4LogicalVolume(tPMT, FindMaterial("Silicon"), "tPMTLog");
+      auto tPMTPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(503.5,0.,0.), PMTcathLogical_[nModule], "tPMTPhy", tModuleLog, false, 0, false);
 
-      else {
-        tPhySimpleBoxS.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(fNmodule), tLogSimpleBoxS, "SimpleBoxPhyS", worldLogical, true, fNmodule, false));
-      } 
-    }
+      new G4LogicalSkinSurface("PMT_surf", tPMTLog, FindSurface("PMT_surf"));
+      
+      tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "tModulePhy", worldLogical, true, fNmodule, false));    
+      
+      tActiveMatLog->SetVisAttributes(fVisAttrOrange);
+      tPMTGlassLog->SetVisAttributes(fVisAttrCyan);
+      tAlHousingLog->SetVisAttributes(fVisAttrGray);
+      tOpCookieLog->SetVisAttributes(fVisAttrYellow);
+      PMTcathLogical_[nModule]->SetVisAttributes(fVisAttrGreen); 
+    } 
   }
-
-  // Al pipe
-  auto tAlBox = new G4Box("AlBox", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
-  auto tLogAlBoxC = new G4LogicalVolume(tAlBox, FindMaterial("Aluminum"), "AlBoxLogC");
-  auto tLogAlBoxS = new G4LogicalVolume(tAlBox, FindMaterial("Aluminum"), "AlBoxLogS");
-  auto tPhyAlBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.5,0.,0.), tLogAlBoxC, "AlBoxPhyC", tLogSimpleBoxC, false, 0, false);
-  auto tPhyAlBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.5,0.,0.), tLogAlBoxS, "AlBoxPhyS", tLogSimpleBoxS, false, 0, false);
-
-  // Water 
-  auto tWaterBox = new G4Box("WaterBox", (996.75 / 2.) *mm, (25. / 2.) *mm, (25. / 2.) *mm);
-  auto tLogWaterBoxC = new G4LogicalVolume(tWaterBox, FindMaterial("Water"), "WaterBoxLogC");
-  auto tLogWaterBoxS = new G4LogicalVolume(tWaterBox, FindMaterial("LS"), "WaterBoxLogS");
-  auto tPhyWaterBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tLogWaterBoxC, "WaterBoxPhyC", tLogAlBoxC, false, 0, false);
-  auto tPhyWaterBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tLogWaterBoxS, "WaterBoxPhyS", tLogAlBoxS, false, 0, false);
-
-  // Glass
-  auto tGlassBox = new G4Box("GlassBox", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
-  auto tLogGlassBox = new G4LogicalVolume(tGlassBox, FindMaterial("Glass"), "GlassBoxLog");
-  auto tPhyGlassBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(499.5,0.,0.), tLogGlassBox, "GlassBoxPhyC", tLogSimpleBoxC, false, 0, false);
-  auto tPhyGlassBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(499.5,0.,0.), tLogGlassBox, "GlassBoxPhyS", tLogSimpleBoxS, false, 0, false);
-  
-  // Optical Cookie
-  auto tOpCookieBox = new G4Box("OpCookieBox", (3. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
-  auto tLogOpCookieBox = new G4LogicalVolume(tOpCookieBox, FindMaterial("Gelatin"), "OpCookieBoxLog");
-  auto tPhyOpCookieBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(501.5,0.,0.), tLogOpCookieBox, "OpCookieBoxPhyC", tLogSimpleBoxC, false, 0, false);
-  auto tPhyOpCookieBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(501.5,0.,0.), tLogOpCookieBox, "OpCookieBoxPhyS", tLogSimpleBoxS, false, 0, false);
-
-  // Detector
-  auto tDetectorBox = new G4Box("DetectorBox", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
-  auto tLogDetectorBox = new G4LogicalVolume(tDetectorBox, FindMaterial("Silicon"), "DetectorBoxLog");
-  auto tPhyDetectorBoxC = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(503.5,0.,0.), tLogDetectorBox, "DetectorBoxPhyC", tLogSimpleBoxC, false, 0, false);
-  auto tPhyDetectorBoxS = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(503.5,0.,0.), tLogDetectorBox, "DetectorBoxPhyS", tLogSimpleBoxS, false, 0, false);
-
-  tLogGlassBox->SetVisAttributes(fVisAttrCyan);
-  tLogWaterBoxC->SetVisAttributes(fVisAttrBlue);
-  tLogWaterBoxS->SetVisAttributes(fVisAttrOrange);
-  tLogAlBoxC->SetVisAttributes(fVisAttrGray);
-  tLogAlBoxS->SetVisAttributes(fVisAttrGray);
-  tLogOpCookieBox->SetVisAttributes(fVisAttrYellow);
-  tLogDetectorBox->SetVisAttributes(fVisAttrGreen);
 
 
   // for (int i = 0; i < fNofModules; i++) {    
