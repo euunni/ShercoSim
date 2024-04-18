@@ -100,6 +100,12 @@ public:
     std::vector<DRsimGenData> GenPtcs;
   };
 
+  bool RecoInterface::IsCerenkov(int nModule) {
+    bool isCeren = nModule % 2 == 0 ? true : false;
+
+    return isCeren;
+  }
+
 };
 
 #endif
