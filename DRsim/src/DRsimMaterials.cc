@@ -211,12 +211,15 @@ void DRsimMaterials::CreateMaterials() {
   mpLS = new G4MaterialPropertiesTable();
   mpLS->AddProperty("RINDEX",opEn_RI_LS,RI_LS,RIEnt_LS);
   mpLS->AddProperty("ABSLENGTH",&(opEn_Abs_LS[0]),&(AbsLen_LS[0]),AbsEnt_LS);
-  mpLS->AddConstProperty("SCINTILLATIONYIELD",9.656/keV);
+  mpLS->AddConstProperty("SCINTILLATIONYIELD",9656/MeV);
   mpLS->AddConstProperty("RESOLUTIONSCALE",1.0);
+  mpLS->AddConstProperty("SCINTILLATIONTIMECONSTANT",2.0*ns); // example
   fLS->SetMaterialPropertiesTable(mpLS);
   fLS->GetIonisation()->SetBirksConstant(0.117*mm/MeV);
 
-  // LS : dy_dwavelength, Otical scattering fraction, REEMISSION_PROB
+  // LS : dy_dwavelength, Otical scattering fraction, REEMISSION_PROB -> in RAT sim
+  // LS : fast/slow component
+  // Bis-MSB : Need to add absorption and emission.
 
   // Water Refractive Index
   G4double opEn_RI_Water[] = { // from 800nm to 200nm with 50nm step
