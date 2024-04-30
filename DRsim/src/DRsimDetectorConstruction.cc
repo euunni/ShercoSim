@@ -195,7 +195,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       auto tActiveMatLog = new G4LogicalVolume(tActiveMat, FindMaterial("Water"), "tActiveMatLog");
       auto tActiveMatPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tActiveMatLog, "tActiveMatPhy", tAlHousingLog, false, 0, false);
       
-      new G4LogicalSkinSurface("AL_surf", tActiveMatLog, FindSurface("AL_surf"));
+      new G4LogicalSkinSurface("AlSurf", tActiveMatLog, FindSurface("AlSurf"));
       
       auto tPMTGlass = new G4Box("tPMTGlass", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
       auto tPMTGlassLog = new G4LogicalVolume(tPMTGlass, FindMaterial("Glass"), "tPMTGlassLog");
@@ -209,7 +209,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       PMTcathLogical_[nModule] = new G4LogicalVolume(tPMT, FindMaterial("Silicon"), "tPMTLog");
       auto tPMTPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(503.5,0.,0.), PMTcathLogical_[nModule], "tPMTPhy", tModuleLog, false, 0, false);
       
-      new G4LogicalSkinSurface("PMT_surf", PMTcathLogical_[nModule], FindSurface("PMT_surf"));
+      new G4LogicalSkinSurface("PMTsurf", PMTcathLogical_[nModule], FindSurface("PMTsurf"));
       
       tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "tModulePhy", worldLogical, true, nModule, false));
       
@@ -231,7 +231,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       auto tActiveMatLog = new G4LogicalVolume(tActiveMat, FindMaterial("LS"), "tActiveMatLog");
       auto tActiveMatPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tActiveMatLog, "tActiveMatPhy", tAlHousingLog, false, 0, false);
       
-      new G4LogicalSkinSurface("AL_surf", tActiveMatLog, FindSurface("AL_surf"));
+      new G4LogicalSkinSurface("AlSurf", tActiveMatLog, FindSurface("AlSurf"));
       
       auto tPMTGlass = new G4Box("tPMTGlass", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
       auto tPMTGlassLog = new G4LogicalVolume(tPMTGlass, FindMaterial("Glass"), "tPMTGlassLog");
@@ -245,7 +245,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       PMTcathLogical_[nModule] = new G4LogicalVolume(tPMT, FindMaterial("Silicon"), "tPMTLog");
       auto tPMTPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(503.5,0.,0.), PMTcathLogical_[nModule], "tPMTPhy", tModuleLog, false, 0, false);
 
-      new G4LogicalSkinSurface("PMT_surf", PMTcathLogical_[nModule], FindSurface("PMT_surf"));
+      new G4LogicalSkinSurface("PMTsurf", PMTcathLogical_[nModule], FindSurface("PMTsurf"));
       
       tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "tModulePhy", worldLogical, true, nModule, false));    
       

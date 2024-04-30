@@ -37,9 +37,10 @@ G4Material* DRsimMaterials::GetMaterial(const G4String matName) {
 }
 
 G4OpticalSurface* DRsimMaterials::GetOpticalSurface(const G4String surfName) {
-  if (surfName=="SiPMSurf") return fSiPMSurf;
-  else if (surfName=="FilterSurf") return fFilterSurf;
-  else if (surfName=="MirrorSurf") return fMirrorSurf;
+  if (surfName == "PMTsurf") return fSiPMSurf;
+  else if (surfName == "FilterSurf") return fFilterSurf;
+  else if (surfName == "MirrorSurf") return fMirrorSurf;
+  else if (surfName == "AlSurf") return fAlSurf
   else {
     std::ostringstream o;
     o << "OpticalSurface " << surfName << " not found!";
@@ -170,7 +171,7 @@ void DRsimMaterials::CreateMaterials() {
   G4MaterialPropertiesTable* mpMirrorSurf;
   G4MaterialPropertiesTable* mpLS;
   G4MaterialPropertiesTable* mpWater;
-  G4MaterialPropertiesTable* mpAl;
+  G4MaterialPropertiesTable* mpAlSurf;
 
 
   // LS Refractive Index
@@ -244,16 +245,6 @@ void DRsimMaterials::CreateMaterials() {
   mpWater->AddProperty("ABSLENGTH",&(opEn_Abs_Water[0]),&(AbsLen_Water[0]),AbsEnt_Water);
   fWater->SetMaterialPropertiesTable(mpWater);
 
-  // Aluminium Reflection
-  G4double AlRef[AbsEnt_LS]; std::fill_n(AlRef, AbsEnt_LS, 0.95);
-
-  mpAl = new G4MaterialPropertiesTable();
-  mpAl->AddProperty("REFLECTIVITY",&(opEn_Abs_LS[0]),AlRef,AbsEnt_LS);
-  fAl->SetMaterialPropertiesTable(mpAl);
-
-
-
-
   G4double opEn[] = { // from 900nm to 300nm with 25nm step
     1.37760*eV, 1.41696*eV, 1.45864*eV, 1.50284*eV, 1.54980*eV, 1.59980*eV, 1.65312*eV, 1.71013*eV,
     1.77120*eV, 1.83680*eV, 1.90745*eV, 1.98375*eV, 2.06640*eV, 2.15625*eV, 2.25426*eV, 2.36160*eV,
@@ -261,6 +252,26 @@ void DRsimMaterials::CreateMaterials() {
   };
 
   const G4int nEnt = sizeof(opEn) / sizeof(G4double);
+
+  // Aluminium Reflection - Surface logical
+  G4double AlRef[nEnt]; std::fill_n(AlRef, nEnt, 0.95);
+  G4double AlEff[nEnt]; std::fill_n(AlEff, nEnt, 0.);
+
+  mpAlSurf = new G4MaterialPropertiesTable();
+  mpAlSurf->AddProperty("TRANSMITTANCE",opEn,AlEff,nEnt);
+  mpAlSurf->AddProperty("REFLECTIVITY",opEn,AlRef,nEnt);
+
+  fAlSurf = new G4OpticalSurface("AlSurf",glisur,polished,dielectric_metal);
+  fAlSurf->SetMaterialPropertiesTable(mpAlSurf);
+
+  G4double MirrorRef[nEnt]; std::fill_n(MirrorRef, nEnt, 0.9);
+  G4double MirrorEff[nEnt]; std::fill_n(MirrorEff, nEnt, 0.);
+
+  mpMirrorSurf = new G4MaterialPropertiesTable();
+  mpMirrorSurf->AddProperty("TRANSMITTANCE",opEn,MirrorEff,nEnt);
+  mpMirrorSurf->AddProperty("REFLECTIVITY",opEn,MirrorRef,nEnt);
+  fMirrorSurf = new G4OpticalSurface("MirrorSurf",glisur,polished,dielectric_metal);
+  fMirrorSurf->SetMaterialPropertiesTable(mpMirrorSurf);
 
   G4double RI_Air[nEnt]; std::fill_n(RI_Air,nEnt,1.0);
   mpAir = new G4MaterialPropertiesTable();
@@ -320,6 +331,7 @@ void DRsimMaterials::CreateMaterials() {
   mpGlass->AddProperty("ABSLENGTH",opEn,Abslength_Glass,nEnt);
   fGlass->SetMaterialPropertiesTable(mpGlass);
 
+  // TODO: Change to our PMT info.
   G4double refl_SiPM[nEnt]; std::fill_n(refl_SiPM, nEnt, 0.);
   G4double eff_SiPM[nEnt] = {
     0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10,
@@ -329,7 +341,7 @@ void DRsimMaterials::CreateMaterials() {
   mpSiPM = new G4MaterialPropertiesTable();
   mpSiPM->AddProperty("REFLECTIVITY",opEn,refl_SiPM,nEnt);
   mpSiPM->AddProperty("EFFICIENCY",opEn,eff_SiPM,nEnt);
-  fSiPMSurf = new G4OpticalSurface("SiPMSurf",glisur,polished,dielectric_metal);
+  fSiPMSurf = new G4OpticalSurface("PMTsurf",glisur,polished,dielectric_metal);
   fSiPMSurf->SetMaterialPropertiesTable(mpSiPM);
 
   G4double filterEff[nEnt] = {
