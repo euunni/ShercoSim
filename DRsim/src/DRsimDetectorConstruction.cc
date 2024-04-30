@@ -185,7 +185,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
     if ( isCeren == true ) {
       
       auto tModule = new G4Box("Module", (1008. / 2.) *mm, (37.5 / 2.) *mm, (37.5 / 2.) *mm);
-      auto tModuleLog = new G4LogicalVolume(tModule, FindMaterial("Iron"), "Module_" + std::to_string(nModule));
+      auto tModuleLog = new G4LogicalVolume(tModule, FindMaterial("Iron"), "tLogModule_" + std::to_string(nModule));
       
       auto tAlHousing = new G4Box("tAlHousing", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
       auto tAlHousingLog = new G4LogicalVolume(tAlHousing, FindMaterial("Aluminum"), "tAlHousingLog");
@@ -211,8 +211,8 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       
       new G4LogicalSkinSurface("PMTsurf", PMTcathLogical_[nModule], FindSurface("PMTsurf"));
       
-      tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "tModulePhy", worldLogical, true, nModule, false));
-      
+      tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "Module_" + std::to_string(nModule), worldLogical, true, nModule, false));
+
       tActiveMatLog->SetVisAttributes(fVisAttrBlue);
       tPMTGlassLog->SetVisAttributes(fVisAttrCyan);
       tAlHousingLog->SetVisAttributes(fVisAttrGray);
@@ -221,7 +221,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
     } else {
       
       auto tModule = new G4Box("Module", (1008. / 2.) *mm, (37.5 / 2.) *mm, (37.5 / 2.) *mm);
-      auto tModuleLog = new G4LogicalVolume(tModule, FindMaterial("Iron"), "Module_" + std::to_string(nModule));
+      auto tModuleLog = new G4LogicalVolume(tModule, FindMaterial("Iron"), "tLogModule_" + std::to_string(nModule));
       
       auto tAlHousing = new G4Box("tAlHousing", (997. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
       auto tAlHousingLog = new G4LogicalVolume(tAlHousing, FindMaterial("Aluminum"), "tAlHousingLog");
@@ -247,7 +247,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
 
       new G4LogicalSkinSurface("PMTsurf", PMTcathLogical_[nModule], FindSurface("PMTsurf"));
       
-      tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "tModulePhy", worldLogical, true, nModule, false));    
+      tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "Module_" + std::to_string(nModule), worldLogical, true, nModule, false));    
       
       tActiveMatLog->SetVisAttributes(fVisAttrOrange);
       tPMTGlassLog->SetVisAttributes(fVisAttrCyan);
