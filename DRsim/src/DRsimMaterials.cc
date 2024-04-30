@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <algorithm>
 #include <cmath>
+#include <iostream>
+#include <fstream>
+
 
 DRsimMaterials* DRsimMaterials::fInstance = 0;
 
@@ -59,29 +62,64 @@ void DRsimMaterials::CreateMaterials() {
   G4Element* O  = new G4Element("Oxygen"  ,symbol="O" , z=8., a=16.00*g/mole);
   G4Element* F  = new G4Element("Fluorine",symbol="F" , z=9., a=18.9984*g/mole);
 
-  // LS
-  fLAB = new G4Material("LAB", density=0.863*g/cm3, 4, kStateLiquid);
-  fLAB->AddElement(C, 6);
-  fLAB->AddElement(H, 5);
-  fLAB->AddElement(C, 12);
-  fLAB->AddElement(H, 25);
+  // Lab
+  G4int fNofC;
+  G4int fNofH;
+  char fName[20];
 
-  fPPO = new G4Material("PPO", density=1.094*g/cm3, 4, kStateLiquid);
+  for ( int i = 0; i < 6; i++ ) {
+    fNofC = i + 15;
+    fNofH = 2 * (i + 9) + 6;
+    fLAB[i] = new G4Material(fName, density=0.863*g/cm3, 2);
+    fLAB[i]->AddElement(C, fNofC);
+    fLAB[i]->AddElement(H, fNofH);
+    fLAB[i]->SetChemicalFormula("AROMATIC");
+    
+    G4double fLABMol = C->GetA()*fNofC + H->GetA()*fNofH;
+    G4MaterialPropertiesTable* mpLAB = new G4MaterialPropertiesTable();
+    mpLAB->AddConstProperty("LABMol", fLABMol/g);
+    fLAB[i]->SetMaterialPropertiesTable(mpLAB);
+  }
+
+  // PPO
+  fPPO = new G4Material("PPO", density=1.094*g/cm3, 4);
+  fPPO->SetChemicalFormula("FLUOR");
   fPPO->AddElement(C, 15);
   fPPO->AddElement(H, 11);
   fPPO->AddElement(N, 1);
   fPPO->AddElement(O, 1);
 
-  fBisMSB = new G4Material("BisMSB", density=1.3*g/cm3, 2, kStateLiquid);
+  G4double fPPOMol = C->GetA()*15 + H->GetA()*11 + N->GetA()*1 + O->GetA()*1;
+  G4MaterialPropertiesTable* mpPPO = new G4MaterialPropertiesTable();
+  mpPPO->AddConstProperty("PPOMol", fPPOMol/g);
+  fPPO->SetMaterialPropertiesTable(mpPPO);
+
+  // Bis-MSB
+  fBisMSB = new G4Material("Bis-MSB", density=1.3*g/cm3, 2);
+  fBisMSB->SetChemicalFormula("WLS"); // Wavelength Shifter
   fBisMSB->AddElement(C, 24);
   fBisMSB->AddElement(H, 22);
 
-  fLS = new G4Material("LS", density=0.865*g/cm3, 3, kStateLiquid);
-  fLS->AddMaterial(fLAB, 99.697*perCent);
-  fLS->AddMaterial(fPPO, 0.3*perCent);
-  fLS->AddMaterial(fBisMSB, 0.003*perCent);
+  G4double fBisMol = C->GetA()*24 + H->GetA()*22;
+  G4MaterialPropertiesTable* mpBisMSB = new G4MaterialPropertiesTable();
+  mpBisMSB->AddConstProperty("BisMol", fBisMol/g);
+  fBisMSB->SetMaterialPropertiesTable(mpBisMSB);
 
-  // Water
+  // LS
+  G4double fLSdensity =  0.865*g/cm3;
+  fLS = new G4Material("LS", fLSdensity, 8);
+  G4double fPPOFrac = 3*g / (1e3*cm3 * fLSdensity);
+  G4double fBisFrac = 0.03*g / (1e3*cm3 * fLSdensity);
+  
+  fLS->AddMaterial(fLAB[0], 0.0047 / (1.0 + fPPOFrac + fBisFrac));
+  fLS->AddMaterial(fLAB[1], 0.097 / (1.0 + fPPOFrac + fBisFrac));
+  fLS->AddMaterial(fLAB[2], 0.3385 / (1.0 + fPPOFrac + fBisFrac));
+  fLS->AddMaterial(fLAB[3], 0.3472 / (1.0 + fPPOFrac + fBisFrac));
+  fLS->AddMaterial(fLAB[4], 0.2083 / (1.0 + fPPOFrac + fBisFrac));
+  fLS->AddMaterial(fLAB[5], 0.0043 / (1.0 + fPPOFrac + fBisFrac));
+  fLS->AddMaterial(fBisMSB, fBisFrac / (1.0 + fPPOFrac + fBisFrac));
+
+  // Water 
   fWater = new G4Material("Water", density=1*g/cm3, 2, kStateLiquid);
   fWater->AddElement(H, 2);
   fWater->AddElement(O, 1);  
@@ -130,6 +168,88 @@ void DRsimMaterials::CreateMaterials() {
   G4MaterialPropertiesTable* mpFilterSurf;
   G4MaterialPropertiesTable* mpMirror;
   G4MaterialPropertiesTable* mpMirrorSurf;
+  G4MaterialPropertiesTable* mpLS;
+  G4MaterialPropertiesTable* mpWater;
+  G4MaterialPropertiesTable* mpAl;
+
+
+  // LS Refractive Index
+  G4double opEn_RI_LS[] = { // from 800nm to 200nm with 100nm step
+    1.54980*eV, 1.77120*eV, 2.06640*eV, 2.47968*eV, 3.09960*eV, 4.13281*eV, 6.19921*eV
+  };
+
+  const G4int RIEnt_LS = sizeof(opEn_RI_LS) / sizeof(G4double);
+
+  G4double RI_LS[RIEnt_LS] = { 
+    1.47571, 1.47871, 1.48334, 1.49107, 1.50541, 1.53694, 1.63112
+  };
+
+  // LS Absorption Length
+  G4double waveLen_LS, AbsLen_LS_tmp;
+  std::vector<G4double> opEn_Abs_LS;
+  std::vector<G4double> AbsLen_LS;
+
+  std::ifstream in;
+  in.open("AbsLength_LS.txt", std::ios::in);
+  
+  while (true) { // wavelength[nm] * opEn[eV] = 1,239.84
+    in >> waveLen_LS >> AbsLen_LS_tmp;
+    
+    if ( !in.good() )
+      break;
+
+    opEn_Abs_LS.push_back((1239.84/waveLen_LS)*eV); // Unit : eV
+    AbsLen_LS.push_back((AbsLen_LS_tmp/1000.)*m); // Unit : m 
+  }
+  in.close();
+
+  std::reverse(opEn_Abs_LS.begin(), opEn_Abs_LS.end());
+  std::reverse(AbsLen_LS.begin(), AbsLen_LS.end());
+
+  const G4int AbsEnt_LS = AbsLen_LS.size();
+
+  mpLS = new G4MaterialPropertiesTable();
+  mpLS->AddProperty("RINDEX",opEn_RI_LS,RI_LS,RIEnt_LS);
+  mpLS->AddProperty("ABSLENGTH",&(opEn_Abs_LS[0]),&(AbsLen_LS[0]),AbsEnt_LS);
+  mpLS->AddConstProperty("SCINTILLATIONYIELD",9.656/keV);
+  mpLS->AddConstProperty("RESOLUTIONSCALE",1.0);
+  fLS->SetMaterialPropertiesTable(mpLS);
+  fLS->GetIonisation()->SetBirksConstant(0.117*mm/MeV);
+
+  // LS : dy_dwavelength, Otical scattering fraction, REEMISSION_PROB
+
+  // Water Refractive Index
+  G4double opEn_RI_Water[] = { // from 800nm to 200nm with 50nm step
+    1.54980*eV, 1.65312*eV, 1.77120*eV, 1.90745*eV, 2.06640*eV, 2.25426*eV,
+    2.47968*eV, 2.75520*eV, 3.09960*eV, 3.54241*eV, 4.13281*eV, 4.95937*eV, 6.19921*eV
+  };
+  
+  const G4int RIEnt_Water = sizeof(opEn_RI_Water) / sizeof(G4double);
+
+  G4double RI_Water[RIEnt_Water] = { 
+    1.3292, 1.32986, 1.33065, 1.33165, 1.33293, 1.33458,
+    1.33676, 1.3397, 1.34378, 1.34978, 1.35942, 1.37761, 1.42516
+  };
+
+  // Water Absorption length
+  G4double opEn_Abs_Water[] = {1.54980*eV, 6.19921*eV};
+  const G4int AbsEnt_Water = sizeof(opEn_Abs_Water) / sizeof(G4double);
+  G4double AbsLen_Water[AbsEnt_Water] = {10.*m, 10.*m};
+
+  mpWater = new G4MaterialPropertiesTable();
+  mpWater->AddProperty("RINDEX",opEn_RI_Water,RI_Water,RIEnt_Water);
+  mpWater->AddProperty("ABSLENGTH",&(opEn_Abs_Water[0]),&(AbsLen_Water[0]),AbsEnt_Water);
+  fWater->SetMaterialPropertiesTable(mpWater);
+
+  // Aluminium Reflection
+  G4double AlRef[AbsEnt_LS]; std::fill_n(AlRef, AbsEnt_LS, 0.95);
+
+  mpAl = new G4MaterialPropertiesTable();
+  mpAl->AddProperty("REFLECTIVITY",&(opEn_Abs_LS[0]),AlRef,AbsEnt_LS);
+  fAl->SetMaterialPropertiesTable(mpAl);
+
+
+
 
   G4double opEn[] = { // from 900nm to 300nm with 25nm step
     1.37760*eV, 1.41696*eV, 1.45864*eV, 1.50284*eV, 1.54980*eV, 1.59980*eV, 1.65312*eV, 1.71013*eV,
@@ -143,7 +263,7 @@ void DRsimMaterials::CreateMaterials() {
   mpAir = new G4MaterialPropertiesTable();
   mpAir->AddProperty("RINDEX",opEn,RI_Air,nEnt);
   fAir->SetMaterialPropertiesTable(mpAir);
-
+  
   G4double RI_PMMA[nEnt] = {
     1.48329, 1.48355, 1.48392, 1.48434, 1.48467, 1.48515, 1.48569, 1.48628,
     1.48677, 1.48749, 1.48831, 1.48899, 1.49000, 1.49119, 1.49219, 1.49372,
@@ -154,6 +274,7 @@ void DRsimMaterials::CreateMaterials() {
     4.343*m, 14.48*m, 21.71*m, 8.686*m, 28.95*m, 54.29*m, 43.43*m, 48.25*m,
     54.29*m, 48.25*m, 43.43*m, 28.95*m, 21.71*m, 4.343*m, 2.171*m, 0.869*m, 0.434*m
   };
+
   mpPMMA = new G4MaterialPropertiesTable();
   mpPMMA->AddProperty("RINDEX",opEn,RI_PMMA,nEnt);
   mpPMMA->AddProperty("ABSLENGTH",opEn,AbsLen_PMMA,nEnt);
