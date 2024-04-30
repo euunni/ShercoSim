@@ -40,7 +40,7 @@ G4OpticalSurface* DRsimMaterials::GetOpticalSurface(const G4String surfName) {
   if (surfName == "PMTsurf") return fSiPMSurf;
   else if (surfName == "FilterSurf") return fFilterSurf;
   else if (surfName == "MirrorSurf") return fMirrorSurf;
-  else if (surfName == "AlSurf") return fAlSurf
+  else if (surfName == "AlSurf") return fAlSurf;
   else {
     std::ostringstream o;
     o << "OpticalSurface " << surfName << " not found!";
@@ -263,15 +263,6 @@ void DRsimMaterials::CreateMaterials() {
 
   fAlSurf = new G4OpticalSurface("AlSurf",glisur,polished,dielectric_metal);
   fAlSurf->SetMaterialPropertiesTable(mpAlSurf);
-
-  G4double MirrorRef[nEnt]; std::fill_n(MirrorRef, nEnt, 0.9);
-  G4double MirrorEff[nEnt]; std::fill_n(MirrorEff, nEnt, 0.);
-
-  mpMirrorSurf = new G4MaterialPropertiesTable();
-  mpMirrorSurf->AddProperty("TRANSMITTANCE",opEn,MirrorEff,nEnt);
-  mpMirrorSurf->AddProperty("REFLECTIVITY",opEn,MirrorRef,nEnt);
-  fMirrorSurf = new G4OpticalSurface("MirrorSurf",glisur,polished,dielectric_metal);
-  fMirrorSurf->SetMaterialPropertiesTable(mpMirrorSurf);
 
   G4double RI_Air[nEnt]; std::fill_n(RI_Air,nEnt,1.0);
   mpAir = new G4MaterialPropertiesTable();
