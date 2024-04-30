@@ -44,7 +44,10 @@ target_link_libraries(
 )
 
 file(GLOB DRsim_MACROS ${PROJECT_SOURCE_DIR}/*.mac)
+file(GLOB LS_ABS ${PROJECT_SOURCE_DIR}/AbsLength_LS.txt)
+
 file(COPY ${DRsim_MACROS} DESTINATION ${PROJECT_BINARY_DIR})
+file(COPY ${LS_ABS} DESTINATION ${PROJECT_BINARY_DIR})
 
 #----------------------------------------------------------------------------
 # Add program to the project targets
