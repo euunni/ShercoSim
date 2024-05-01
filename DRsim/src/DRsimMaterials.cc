@@ -63,24 +63,26 @@ void DRsimMaterials::CreateMaterials() {
   G4Element* O  = new G4Element("Oxygen"  ,symbol="O" , z=8., a=16.00*g/mole);
   G4Element* F  = new G4Element("Fluorine",symbol="F" , z=9., a=18.9984*g/mole);
 
-  // Lab
-  G4int fNofC;
-  G4int fNofH;
-  char fName[20];
+  // Ver 1.
 
-  for ( int i = 0; i < 6; i++ ) {
-    fNofC = i + 15;
-    fNofH = 2 * (i + 9) + 6;
-    fLAB[i] = new G4Material(fName, density=0.863*g/cm3, 2);
-    fLAB[i]->AddElement(C, fNofC);
-    fLAB[i]->AddElement(H, fNofH);
-    fLAB[i]->SetChemicalFormula("AROMATIC");
+  // Lab
+  // G4int fNofC;
+  // G4int fNofH;
+  // char fName[20];
+
+  // for ( int i = 0; i < 6; i++ ) {
+  //   fNofC = i + 15;
+  //   fNofH = 2 * (i + 9) + 6;
+  //   fLAB[i] = new G4Material(fName, density=0.863*g/cm3, 2);
+  //   fLAB[i]->AddElement(C, fNofC);
+  //   fLAB[i]->AddElement(H, fNofH);
+  //   fLAB[i]->SetChemicalFormula("AROMATIC");
     
-    G4double fLABMol = C->GetA()*fNofC + H->GetA()*fNofH;
-    G4MaterialPropertiesTable* mpLAB = new G4MaterialPropertiesTable();
-    mpLAB->AddConstProperty("LABMol", fLABMol/g);
-    fLAB[i]->SetMaterialPropertiesTable(mpLAB);
-  }
+  //   G4double fLABMol = C->GetA()*fNofC + H->GetA()*fNofH;
+  //   G4MaterialPropertiesTable* mpLAB = new G4MaterialPropertiesTable();
+  //   mpLAB->AddConstProperty("LABMol", fLABMol/g);
+  //   fLAB[i]->SetMaterialPropertiesTable(mpLAB);
+  // }
 
   // PPO
   fPPO = new G4Material("PPO", density=1.094*g/cm3, 4);
@@ -95,7 +97,7 @@ void DRsimMaterials::CreateMaterials() {
   mpPPO->AddConstProperty("PPOMol", fPPOMol/g);
   fPPO->SetMaterialPropertiesTable(mpPPO);
 
-  // Bis-MSB
+  // // Bis-MSB
   fBisMSB = new G4Material("Bis-MSB", density=1.3*g/cm3, 2);
   fBisMSB->SetChemicalFormula("WLS"); // Wavelength Shifter
   fBisMSB->AddElement(C, 24);
@@ -107,18 +109,47 @@ void DRsimMaterials::CreateMaterials() {
   fBisMSB->SetMaterialPropertiesTable(mpBisMSB);
 
   // LS
-  G4double fLSdensity =  0.865*g/cm3;
-  fLS = new G4Material("LS", fLSdensity, 8);
-  G4double fPPOFrac = 3*g / (1e3*cm3 * fLSdensity);
-  G4double fBisFrac = 0.03*g / (1e3*cm3 * fLSdensity);
+  // G4double fLSdensity =  0.865*g/cm3;
+  // fLS = new G4Material("LS", fLSdensity, 8);
+  // G4double fPPOFrac = 3*g / (1e3*cm3 * fLSdensity);
+  // G4double fBisFrac = 0.03*g / (1e3*cm3 * fLSdensity);
   
-  fLS->AddMaterial(fLAB[0], 0.0047 / (1.0 + fPPOFrac + fBisFrac));
-  fLS->AddMaterial(fLAB[1], 0.097 / (1.0 + fPPOFrac + fBisFrac));
-  fLS->AddMaterial(fLAB[2], 0.3385 / (1.0 + fPPOFrac + fBisFrac));
-  fLS->AddMaterial(fLAB[3], 0.3472 / (1.0 + fPPOFrac + fBisFrac));
-  fLS->AddMaterial(fLAB[4], 0.2083 / (1.0 + fPPOFrac + fBisFrac));
-  fLS->AddMaterial(fLAB[5], 0.0043 / (1.0 + fPPOFrac + fBisFrac));
-  fLS->AddMaterial(fBisMSB, fBisFrac / (1.0 + fPPOFrac + fBisFrac));
+  // fLS->AddMaterial(fLAB[0], 0.0047 / (1.0 + fPPOFrac + fBisFrac));
+  // fLS->AddMaterial(fLAB[1], 0.097 / (1.0 + fPPOFrac + fBisFrac));
+  // fLS->AddMaterial(fLAB[2], 0.3385 / (1.0 + fPPOFrac + fBisFrac));
+  // fLS->AddMaterial(fLAB[3], 0.3472 / (1.0 + fPPOFrac + fBisFrac));
+  // fLS->AddMaterial(fLAB[4], 0.2083 / (1.0 + fPPOFrac + fBisFrac));
+  // fLS->AddMaterial(fLAB[5], 0.0043 / (1.0 + fPPOFrac + fBisFrac));
+  // fLS->AddMaterial(fBisMSB, fBisFrac / (1.0 + fPPOFrac + fBisFrac));
+
+  // Ver 2. 
+  
+  // LS
+  fLAB = new G4Material("LAB", density=0.863*g/cm3, 4, kStateLiquid);
+  fLAB->AddElement(C, 6);
+  fLAB->AddElement(H, 5);
+  fLAB->AddElement(C, 12);
+  fLAB->AddElement(H, 25);
+  
+  G4double fLABMol = C->GetA()*18 + H->GetA()*30;
+  G4MaterialPropertiesTable* mpLAB = new G4MaterialPropertiesTable();
+  mpLAB->AddConstProperty("LABMol", fLABMol/g);
+  fLAB->SetMaterialPropertiesTable(mpLAB);
+
+  // fPPO = new G4Material("PPO", density=1.094*g/cm3, 4, kStateLiquid);
+  // fPPO->AddElement(C, 15);
+  // fPPO->AddElement(H, 11);
+  // fPPO->AddElement(N, 1);
+  // fPPO->AddElement(O, 1);
+
+  // fBisMSB = new G4Material("BisMSB", density=1.3*g/cm3, 2, kStateLiquid);
+  // fBisMSB->AddElement(C, 24);
+  // fBisMSB->AddElement(H, 22);
+
+  fLS = new G4Material("LS", density=0.865*g/cm3, 3, kStateLiquid);
+  fLS->AddMaterial(fLAB, 99.697*perCent);
+  fLS->AddMaterial(fPPO, 0.3*perCent);
+  fLS->AddMaterial(fBisMSB, 0.003*perCent);
 
   // Water 
   fWater = new G4Material("Water", density=1*g/cm3, 2, kStateLiquid);

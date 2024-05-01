@@ -33,7 +33,8 @@ private:
   G4Material* fGelatin;
   G4Material* fMirror;
   G4Material* fBlackpaint;
-  G4Material* fLAB[6];
+  // G4Material* fLAB[6];
+  G4Material* fLAB;
   G4Material* fPPO;
   G4Material* fBisMSB;
   G4Material* fLS;
