@@ -28,7 +28,7 @@ void DRsimEventAction::BeginOfEventAction(const G4Event*) {
 
   G4SDManager* sdManager = G4SDManager::GetSDMpointer();
   for (int i = 0; i < DRsimDetectorConstruction::fNofModules; i++) {
-    fSiPMCollID.push_back(sdManager->GetCollectionID("ModuleC"+std::to_string(i)));
+    fSiPMCollID.push_back(sdManager->GetCollectionID("ModuleHC_"+std::to_string(i)));
   }
 
   fEventData = new DRsimInterface::DRsimEventData();

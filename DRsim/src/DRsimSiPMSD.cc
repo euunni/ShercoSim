@@ -10,8 +10,10 @@
 using namespace std;
 
 DRsimSiPMSD::DRsimSiPMSD(const G4String& name, const G4String& hitsCollectionName, DRsimInterface::DRsimModuleProperty ModuleProp)
-: G4VSensitiveDetector(name), fHitCollection(0), fHCID(-1), fWavBin(60), fTimeBin(600),
-fModuleNum(-1), fWavlenStart(900.), fWavlenEnd(300.), fTimeStart(10.), fTimeEnd(70.)
+: G4VSensitiveDetector(name), fHitCollection(0), fHCID(-1), fWavBin(60), fTimeBin(700),
+fModuleNum(-1), fWavlenStart(900.), fWavlenEnd(300.), fTimeStart(0.), fTimeEnd(70.)
+// : G4VSensitiveDetector(name), fHitCollection(0), fHCID(-1), fWavBin(60), fTimeBin(600),
+// fModuleNum(-1), fWavlenStart(900.), fWavlenEnd(300.), fTimeStart(10.), fTimeEnd(70.)
 {
   collectionName.insert(hitsCollectionName);
   fWavlenStep = (fWavlenStart-fWavlenEnd)/(float)fWavBin;
