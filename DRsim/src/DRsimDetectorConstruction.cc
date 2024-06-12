@@ -192,10 +192,11 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       auto tAlHousingPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.5,0.,0.), tAlHousingLog, "tAlHousingPhy", tModuleLog, false, 0, false);
 
       auto tActiveMat = new G4Box("tActiveMat", (996.75 / 2.) *mm, (25. / 2.) *mm, (25. / 2.) *mm);
-      auto tActiveMatLog = new G4LogicalVolume(tActiveMat, FindMaterial("Water"), "tActiveMatLog");
-      auto tActiveMatPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tActiveMatLog, "tActiveMatPhy", tAlHousingLog, false, 0, false);
+      auto tActiveMatLog_C = new G4LogicalVolume(tActiveMat, FindMaterial("Water"), "tActiveMatLog_C");
+      auto tActiveMatPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tActiveMatLog_C, "tActiveMatPhy", tAlHousingLog, false, 0, false);
       
-      new G4LogicalSkinSurface("AlSurf", tActiveMatLog, FindSurface("AlSurf"));
+      // new G4LogicalSkinSurface("AlSurf", tActiveMatLog_C, FindSurface("AlSurf"));
+      new G4LogicalSkinSurface("AlSurf", tAlHousingLog, FindSurface("AlSurf"));
       
       auto tPMTGlass = new G4Box("tPMTGlass", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
       auto tPMTGlassLog = new G4LogicalVolume(tPMTGlass, FindMaterial("Glass"), "tPMTGlassLog");
@@ -213,7 +214,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       
       tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "Module_" + std::to_string(nModule), worldLogical, true, nModule, false));
 
-      tActiveMatLog->SetVisAttributes(fVisAttrBlue);
+      tActiveMatLog_C->SetVisAttributes(fVisAttrBlue);
       tPMTGlassLog->SetVisAttributes(fVisAttrCyan);
       tAlHousingLog->SetVisAttributes(fVisAttrGray);
       tOpCookieLog->SetVisAttributes(fVisAttrYellow);
@@ -228,10 +229,11 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       auto tAlHousingPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.5,0.,0.), tAlHousingLog, "tAlHousingPhy", tModuleLog, false, 0, false);
 
       auto tActiveMat = new G4Box("tActiveMat", (996.75 / 2.) *mm, (25. / 2.) *mm, (25. / 2.) *mm);
-      auto tActiveMatLog = new G4LogicalVolume(tActiveMat, FindMaterial("LS"), "tActiveMatLog");
-      auto tActiveMatPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tActiveMatLog, "tActiveMatPhy", tAlHousingLog, false, 0, false);
+      auto tActiveMatLog_S = new G4LogicalVolume(tActiveMat, FindMaterial("LS"), "tActiveMatLog_S");
+      auto tActiveMatPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tActiveMatLog_S, "tActiveMatPhy", tAlHousingLog, false, 0, false);
       
-      new G4LogicalSkinSurface("AlSurf", tActiveMatLog, FindSurface("AlSurf"));
+      // new G4LogicalSkinSurface("AlSurf", tActiveMatLog_S, FindSurface("AlSurf"));
+      new G4LogicalSkinSurface("AlSurf", tAlHousingLog, FindSurface("AlSurf"));
       
       auto tPMTGlass = new G4Box("tPMTGlass", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
       auto tPMTGlassLog = new G4LogicalVolume(tPMTGlass, FindMaterial("Glass"), "tPMTGlassLog");
@@ -249,7 +251,7 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       
       tModulePhyVec.push_back(new G4PVPlacement(new G4RotationMatrix(G4ThreeVector(0.,1.,0.), 90. *deg), dimCalc->GetOrigin(nModule), tModuleLog, "Module_" + std::to_string(nModule), worldLogical, true, nModule, false));    
       
-      tActiveMatLog->SetVisAttributes(fVisAttrOrange);
+      tActiveMatLog_S->SetVisAttributes(fVisAttrOrange);
       tPMTGlassLog->SetVisAttributes(fVisAttrCyan);
       tAlHousingLog->SetVisAttributes(fVisAttrGray);
       tOpCookieLog->SetVisAttributes(fVisAttrYellow);
