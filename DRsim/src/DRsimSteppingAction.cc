@@ -2,6 +2,7 @@
 
 #include "G4ParticleDefinition.hh"
 #include "G4ParticleTypes.hh"
+#include "G4VProcess.hh"
 
 DRsimSteppingAction::DRsimSteppingAction(DRsimEventAction* eventAction)
 : G4UserSteppingAction(), fEventAction(eventAction)
@@ -10,7 +11,8 @@ DRsimSteppingAction::DRsimSteppingAction(DRsimEventAction* eventAction)
 DRsimSteppingAction::~DRsimSteppingAction() {}
 
 void DRsimSteppingAction::UserSteppingAction(const G4Step* step) {
-  if (step->GetTrack()->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) return;
+  // if (step->GetTrack()->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) 
+  //   return;
 
   G4Track* track = step->GetTrack();
   G4ParticleDefinition* particle = track->GetDefinition();
@@ -20,6 +22,16 @@ void DRsimSteppingAction::UserSteppingAction(const G4Step* step) {
   G4StepPoint* poststeppoint = step->GetPostStepPoint();
   G4LogicalVolume* preVol = presteppoint->GetPhysicalVolume()->GetLogicalVolume();
   G4TouchableHandle theTouchable = presteppoint->GetTouchableHandle();
+
+  if (step->GetTrack()->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
+    G4String processName = " ";
+    if (track->GetCreatorProcess())
+      processName = track->GetCreatorProcess()->GetProcessName();
+
+    G4cout << "Track ID : " << track->GetTrackID() << ", Process name : " << processName << ", Logical volume name : " << preVol->GetName() << G4endl;
+    
+    return;
+  } 
 
   if (poststeppoint->GetStepStatus() == fWorldBoundary) {
     fLeak.E = track->GetTotalEnergy();
