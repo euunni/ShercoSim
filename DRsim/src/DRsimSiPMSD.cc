@@ -26,12 +26,15 @@ fModuleNum(-1), fWavlenStart(900.), fWavlenEnd(300.), fTimeStart(0.), fTimeEnd(7
 DRsimSiPMSD::~DRsimSiPMSD() {}
 
 void DRsimSiPMSD::Initialize(G4HCofThisEvent* hce) {
+  
   fHitCollection = new DRsimSiPMHitsCollection(SensitiveDetectorName,collectionName[0]);
   if (fHCID<0) { fHCID = GetCollectionID(0); }
   hce->AddHitsCollection(fHCID,fHitCollection);
+
 }
 
 G4bool DRsimSiPMSD::ProcessHits(G4Step* step, G4TouchableHistory*) {
+
   if(step->GetTrack()->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition()) return false;
 
   G4int SiPMnum = step->GetPostStepPoint()->GetTouchable()->GetVolume(1)->GetCopyNo();
@@ -43,15 +46,19 @@ G4bool DRsimSiPMSD::ProcessHits(G4Step* step, G4TouchableHistory*) {
 
   for (G4int i = 0; i < nofHits; i++) {
 
-    // G4cout << " Hit iteration : " 
-    //        << i << " " 
-    //        << SiPMnum << " " 
-    //        << (*fHitCollection)[i]->GetSiPMnum() << " " 
-    //        << fModuleNum << " " 
-    //        << (*fHitCollection)[i]->GetModuleNum() << " "
-    //        << G4endl;
-    
-    if ( (*fHitCollection)[i]->GetSiPMnum() == SiPMnum && (*fHitCollection)[i]->GetModuleNum() == fModuleNum ) {
+    bool isCeren = DRsimInterface::IsCerenkov(fModuleNum);
+
+    G4cout << " Hit iteration : " 
+           << i << " " 
+           << SiPMnum << " " 
+           << (*fHitCollection)[i]->GetSiPMnum() << " " 
+           << fModuleNum << " " 
+           << "isCeren : " << isCeren << " "
+           << (*fHitCollection)[i]->GetModuleNum() << " "
+           << G4endl;
+           
+    if ( (*fHitCollection)[i]->GetSiPMnum() == SiPMnum) {
+    // if ( (*fHitCollection)[i]->GetSiPMnum() == SiPMnum && (*fHitCollection)[i]->GetModuleNum() == fModuleNum ) {
       hit = (*fHitCollection)[i];
       break;
     }
@@ -80,6 +87,7 @@ G4bool DRsimSiPMSD::ProcessHits(G4Step* step, G4TouchableHistory*) {
 }
 
 void DRsimSiPMSD::EndOfEvent(G4HCofThisEvent*) {
+  
   if ( verboseLevel>1 ) {
     G4int nofHits = fHitCollection->entries();
     G4cout
@@ -91,6 +99,7 @@ void DRsimSiPMSD::EndOfEvent(G4HCofThisEvent*) {
 }
 
 DRsimInterface::hitRange DRsimSiPMSD::findWavRange(G4double en) {
+
   int i = 0;
   for ( ; i < fWavBin+1; i++) {
     if ( en < wavToE( (fWavlenStart - (float)i*fWavlenStep)*nm ) ) break;
@@ -103,6 +112,7 @@ DRsimInterface::hitRange DRsimSiPMSD::findWavRange(G4double en) {
 }
 
 DRsimInterface::hitRange DRsimSiPMSD::findTimeRange(G4double stepTime) {
+
   int i = 0;
   for ( ; i < fTimeBin+1; i++) {
     if ( stepTime < ( (fTimeStart + (float)i*fTimeStep)*ns ) ) break;
@@ -115,6 +125,7 @@ DRsimInterface::hitRange DRsimSiPMSD::findTimeRange(G4double stepTime) {
 }
 
 DRsimInterface::hitXY DRsimSiPMSD::findSiPMXY(G4int SiPMnum, DRsimInterface::hitXY towerXY) {
+
   int x = SiPMnum/towerXY.second;
   int y = SiPMnum%towerXY.second;
 
