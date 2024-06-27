@@ -204,54 +204,122 @@ void DRsimMaterials::CreateMaterials() {
   G4MaterialPropertiesTable* mpWater;
   G4MaterialPropertiesTable* mpAlSurf;
 
+// **************
 
-  // LS Refractive Index
-  G4double opEn_RI_LS[] = { // from 800nm to 200nm with 100nm step
-    1.54980*eV, 1.77120*eV, 2.06640*eV, 2.47968*eV, 3.09960*eV, 4.13281*eV, 6.19921*eV
-  };
+  // // LS Refractive Index
+  // G4double opEn_RI_LS[] = { // from 800nm to 200nm with 100nm step
+  //   1.54980*eV, 1.77120*eV, 2.06640*eV, 2.47968*eV, 3.09960*eV, 4.13281*eV, 6.19921*eV
+  // };
 
-  const G4int RIEnt_LS = sizeof(opEn_RI_LS) / sizeof(G4double);
+  // const G4int RIEnt_LS = sizeof(opEn_RI_LS) / sizeof(G4double);
 
-  G4double RI_LS[RIEnt_LS] = { 
-    1.47571, 1.47871, 1.48334, 1.49107, 1.50541, 1.53694, 1.63112
-  };
+  // G4double RI_LS[RIEnt_LS] = { 
+  //   1.47571, 1.47871, 1.48334, 1.49107, 1.50541, 1.53694, 1.63112
+  // };
 
-  // LS Absorption Length
-  G4double waveLen_LS, AbsLen_LS_tmp;
-  std::vector<G4double> opEn_Abs_LS;
-  std::vector<G4double> AbsLen_LS;
+  // // LS Absorption Length
+  // G4double waveLen_LS, AbsLen_LS_tmp;
+  // std::vector<G4double> opEn_Abs_LS;
+  // std::vector<G4double> AbsLen_LS;
 
-  std::ifstream in;
-  in.open("AbsLength_LS.txt", std::ios::in);
+  // std::ifstream in;
+  // in.open("AbsLength_LS.txt", std::ios::in);
   
-  while (true) { // wavelength[nm] * opEn[eV] = 1,239.84
-    in >> waveLen_LS >> AbsLen_LS_tmp;
+  // while (true) { // wavelength[nm] * opEn[eV] = 1,239.84
+  //   in >> waveLen_LS >> AbsLen_LS_tmp;
     
-    if ( !in.good() )
-      break;
+  //   if ( !in.good() )
+  //     break;
 
-    opEn_Abs_LS.push_back((1239.84/waveLen_LS)*eV); // Unit : eV
-    AbsLen_LS.push_back((AbsLen_LS_tmp/1000.)*m); // Unit : m 
-  }
-  in.close();
+  //   opEn_Abs_LS.push_back((1239.84/waveLen_LS)*eV); // Unit : eV
+  //   AbsLen_LS.push_back((AbsLen_LS_tmp/1000.)*m); // Unit : m 
+  // }
+  // in.close();
 
-  std::reverse(opEn_Abs_LS.begin(), opEn_Abs_LS.end());
-  std::reverse(AbsLen_LS.begin(), AbsLen_LS.end());
+  // std::reverse(opEn_Abs_LS.begin(), opEn_Abs_LS.end());
+  // std::reverse(AbsLen_LS.begin(), AbsLen_LS.end());
 
-  const G4int AbsEnt_LS = AbsLen_LS.size();
+  // const G4int AbsEnt_LS = AbsLen_LS.size();
+
+  // G4double waveLenForFast_LS, FastCom_LS_tmp;
+  // std::vector<G4double> opEn_FastCom_LS;
+  // std::vector<G4double> FastCom_LS;
+
+  // std::ifstream in2;
+  // in2.open("FastComponent_LS.txt", std::ios::in);
+  
+  // while (true) { // wavelength[nm] * opEn[eV] = 1,239.84
+  //   in2 >> waveLenForFast_LS >> FastCom_LS_tmp;
+    
+  //   if ( !in2.good() )
+  //     break;
+
+  //   opEn_FastCom_LS.push_back((1239.84/waveLenForFast_LS)*eV); // Unit : eV
+  //   FastCom_LS.push_back((FastCom_LS_tmp/1000.)*m); // Unit : m 
+  // }
+  // in2.close();
+
+  // std::reverse(opEn_FastCom_LS.begin(), opEn_FastCom_LS.end());
+  // std::reverse(FastCom_LS.begin(), FastCom_LS.end());
+
+  // const G4int FastEnt_LS = FastCom_LS.size();
+
+  // mpLS = new G4MaterialPropertiesTable();
+  // mpLS->AddProperty("RINDEX",opEn_RI_LS,RI_LS,RIEnt_LS);
+  // mpLS->AddProperty("ABSLENGTH",&(opEn_Abs_LS[0]),&(AbsLen_LS[0]),AbsEnt_LS);
+  // mpLS->AddProperty("FASTCOMPONENT",&(opEn_FastCom_LS[0]),&(FastCom_LS[0]),FastEnt_LS);
+  // // mpLS->AddProperty("FASTCOMPONENT",opEn,scintFast_LS,nEnt);
+  // mpLS->AddConstProperty("SCINTILLATIONYIELD",9656./MeV);
+  // mpLS->AddConstProperty("RESOLUTIONSCALE",1.0);
+  // mpLS->AddConstProperty("SCINTILLATIONTIMECONSTANT",2.0*ns); // example
+  // fLS->SetMaterialPropertiesTable(mpLS);
+  // fLS->GetIonisation()->SetBirksConstant(0.117*mm/MeV);
+
+// **********
+
+  G4double opEn[] = { // from 900nm to 300nm with 25nm step
+    1.37760*eV, 1.41696*eV, 1.45864*eV, 1.50284*eV, 1.54980*eV, 1.59980*eV, 1.65312*eV, 1.71013*eV,
+    1.77120*eV, 1.83680*eV, 1.90745*eV, 1.98375*eV, 2.06640*eV, 2.15625*eV, 2.25426*eV, 2.36160*eV,
+    2.47968*eV, 2.61019*eV, 2.75520*eV, 2.91728*eV, 3.09960*eV, 3.30625*eV, 3.54241*eV, 3.81490*eV, 4.13281*eV
+  };
+
+  const G4int nEnt = sizeof(opEn) / sizeof(G4double);
+
+  G4double RI_LS[nEnt] = {
+    1.47571, 1.47571, 1.47571, 1.47571, 1.47571, 1.47646, 1.47721, 1.47796,
+    1.47871, 1.47987, 1.48103, 1.48218, 1.48334, 1.48527, 1.48721, 1.48914,
+    1.49107, 1.49466, 1.49824, 1.50183, 1.50541, 1.51329, 1.52118, 1.52906, 1.53694 
+  };
+
+  G4double AbsLen_LS[nEnt] = {
+    3.923*m, 3.923*m, 3.923*m, 3.923*m, 3.923*m, 3.172*m, 1.204*m, 4.772*m,
+    7.061*m, 13.49*m, 6.377*m, 13.32*m, 15.74*m, 21.93*m, 25.25*m, 31.47*m,
+    35.02*m, 38.78*m, 23.99*m, 9.086*m, 0.078*m, 0.002*m, 0.001*m, 0.001*m, 0.001*m
+  };
+
+  G4double scintFast_LS[nEnt] = {
+    0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.01, 0.02,
+    0.06, 0.18, 0.49, 1.00, 0.93, 0.05, 0.01, 0.00, 0.00
+  };
+
+  G4double reemit_LS[nEnt] = {
+    0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.00, 0.18, 0.99, 0.99, 0.99, 1.00, 1.00
+  };
 
   mpLS = new G4MaterialPropertiesTable();
-  mpLS->AddProperty("RINDEX",opEn_RI_LS,RI_LS,RIEnt_LS);
-  mpLS->AddProperty("ABSLENGTH",&(opEn_Abs_LS[0]),&(AbsLen_LS[0]),AbsEnt_LS);
-  mpLS->AddConstProperty("SCINTILLATIONYIELD",9656/MeV);
+  mpLS->AddProperty("RINDEX", opEn, RI_LS, nEnt);
+  mpLS->AddProperty("ABSLENGTH",opEn,AbsLen_LS,nEnt);
+  mpLS->AddProperty("FASTCOMPONENT",opEn,scintFast_LS,nEnt);
+  mpLS->AddProperty("WLSCOMPONENT", opEn,reemit_LS,nEnt);
+  mpLS->AddConstProperty("FASTTIMECONSTANT", 2.0*ns);
+  mpLS->AddConstProperty("SCINTILLATIONYIELD", 9656./MeV);
   mpLS->AddConstProperty("RESOLUTIONSCALE",1.0);
-  mpLS->AddConstProperty("SCINTILLATIONTIMECONSTANT",2.0*ns); // example
   fLS->SetMaterialPropertiesTable(mpLS);
   fLS->GetIonisation()->SetBirksConstant(0.117*mm/MeV);
 
-  // LS : dy_dwavelength, Otical scattering fraction, REEMISSION_PROB -> in RAT sim
-  // LS : fast/slow component
-  // Bis-MSB : Need to add absorption and emission.
 
   // Water Refractive Index
   G4double opEn_RI_Water[] = { // from 800nm to 200nm with 50nm step
@@ -276,13 +344,13 @@ void DRsimMaterials::CreateMaterials() {
   mpWater->AddProperty("ABSLENGTH",&(opEn_Abs_Water[0]),&(AbsLen_Water[0]),AbsEnt_Water);
   fWater->SetMaterialPropertiesTable(mpWater);
 
-  G4double opEn[] = { // from 900nm to 300nm with 25nm step
-    1.37760*eV, 1.41696*eV, 1.45864*eV, 1.50284*eV, 1.54980*eV, 1.59980*eV, 1.65312*eV, 1.71013*eV,
-    1.77120*eV, 1.83680*eV, 1.90745*eV, 1.98375*eV, 2.06640*eV, 2.15625*eV, 2.25426*eV, 2.36160*eV,
-    2.47968*eV, 2.61019*eV, 2.75520*eV, 2.91728*eV, 3.09960*eV, 3.30625*eV, 3.54241*eV, 3.81490*eV, 4.13281*eV
-  };
+  // G4double opEn[] = { // from 900nm to 300nm with 25nm step
+  //   1.37760*eV, 1.41696*eV, 1.45864*eV, 1.50284*eV, 1.54980*eV, 1.59980*eV, 1.65312*eV, 1.71013*eV,
+  //   1.77120*eV, 1.83680*eV, 1.90745*eV, 1.98375*eV, 2.06640*eV, 2.15625*eV, 2.25426*eV, 2.36160*eV,
+  //   2.47968*eV, 2.61019*eV, 2.75520*eV, 2.91728*eV, 3.09960*eV, 3.30625*eV, 3.54241*eV, 3.81490*eV, 4.13281*eV
+  // };
 
-  const G4int nEnt = sizeof(opEn) / sizeof(G4double);
+  // const G4int nEnt = sizeof(opEn) / sizeof(G4double);
 
   // Aluminium Reflection - Surface logical
   G4double AlRef[nEnt]; std::fill_n(AlRef, nEnt, 0.95);
