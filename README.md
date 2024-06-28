@@ -1,4 +1,4 @@
-# DRC cosmic (4 by 5 geometry)
+# DRC cosmic : 4 by 5 geometry
 Repository for GEANT4 simulation &amp; analysis of the dual-readout calorimeter for general purpose.
 
 ## How-to
