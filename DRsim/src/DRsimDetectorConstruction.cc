@@ -28,7 +28,7 @@ G4ThreadLocal DRsimMagneticField* DRsimDetectorConstruction::fMagneticField = 0;
 G4ThreadLocal G4FieldManager* DRsimDetectorConstruction::fFieldMgr = 0;
 
 int DRsimDetectorConstruction::fNofRow = 5;
-int DRsimDetectorConstruction::fNofCol = 4;
+int DRsimDetectorConstruction::fNofCol = 8;
 int DRsimDetectorConstruction::fNofModules = fNofRow * fNofCol;
 
 DRsimDetectorConstruction::DRsimDetectorConstruction()
@@ -195,7 +195,6 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       auto tActiveMatLog_C = new G4LogicalVolume(tActiveMat, FindMaterial("Water"), "tActiveMatLog_C");
       auto tActiveMatPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tActiveMatLog_C, "tActiveMatPhy", tAlHousingLog, false, 0, false);
       
-      // new G4LogicalSkinSurface("AlSurf", tActiveMatLog_C, FindSurface("AlSurf"));
       new G4LogicalSkinSurface("AlSurf", tAlHousingLog, FindSurface("AlSurf"));
       
       auto tPMTGlass = new G4Box("tPMTGlass", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
@@ -232,7 +231,6 @@ void DRsimDetectorConstruction::ModuleBuild(G4LogicalVolume* ModuleLogical_[],
       auto tActiveMatLog_S = new G4LogicalVolume(tActiveMat, FindMaterial("LS"), "tActiveMatLog_S");
       auto tActiveMatPhy = new G4PVPlacement(new G4RotationMatrix(), G4ThreeVector(0.125,0.,0.), tActiveMatLog_S, "tActiveMatPhy", tAlHousingLog, false, 0, false);
       
-      // new G4LogicalSkinSurface("AlSurf", tActiveMatLog_S, FindSurface("AlSurf"));
       new G4LogicalSkinSurface("AlSurf", tAlHousingLog, FindSurface("AlSurf"));
       
       auto tPMTGlass = new G4Box("tPMTGlass", (1. / 2.) *mm, (25.5 / 2.) *mm, (25.5 / 2.) *mm);
