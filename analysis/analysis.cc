@@ -6,133 +6,100 @@
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TH1.h"
-#include "TH2.h"
 #include "TCanvas.h"
 #include "TF1.h"
 #include "TPaveStats.h"
 #include "TString.h"
-#include "TLorentzVector.h"
-#include "TGraph.h"
 
 #include <iostream>
 #include <string>
+#include <vector>
+#include <utility>
+#include <map>
+#include <tuple>
+
 
 int main(int argc, char* argv[]) {
-  TString filename = argv[1];
-  TString outputname = argv[2];
+
+  float high = 1.;
+  float low = 0.;
 
   gStyle->SetOptFit(1);
 
-  RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>(std::string(filename), false);
-  drInterface->GetChain("DRsim");
+  TH1F* tEdep = new TH1F("Total_Edep","Total Energy deposit;MeV;Evt",100,low,high*3000);
+  tEdep->Sumw2(); tEdep->SetLineColor(kBlack); tEdep->SetLineWidth(2);
+  TH1F* tCtime = new TH1F("Total_C_Time","Total timing of Cerenkov ch.;ns;Evt",150,0,30);
+  tCtime->Sumw2(); tCtime->SetLineColor(kBlue); tCtime->SetLineWidth(2);
+  TH1F* tStime = new TH1F("Total_S_Time","Total timing of Scintillation ch.;ns;Evt",150,0,30);
+  tStime->Sumw2(); tStime->SetLineColor(kRed); tStime->SetLineWidth(2);
+  TH1I* tChit = new TH1I("Total_C_Hit","Total hits of Cerenkov ch",100,0.,1500.);
+  tChit->Sumw2(); tChit->SetLineColor(kBlue); tChit->SetLineWidth(2);
+  TH1I* tShit = new TH1I("Total_S_Hit","Total hits of Scintillation ch",100,0.,30000.);
+  tShit->Sumw2(); tShit->SetLineColor(kRed); tShit->SetLineWidth(2);
 
-  TH1F* tEdep = new TH1F("totEdep","Total Energy deposit;MeV;Evt",100,0.,10);
-  tEdep->Sumw2(); tEdep->SetLineColor(kRed); tEdep->SetLineWidth(2);
-  TH1F* tHit_C = new TH1F("Hit_C","# of p.e. of Cerenkov ch.;# of p.e.;Evt",50,0,50.);
-  tHit_C->Sumw2(); tHit_C->SetLineColor(kBlue); tHit_C->SetLineWidth(2);
-  TH1F* tHit_S = new TH1F("Hit_S","# of p.e. of Scintillation ch.;# of p.e.;Evt",50,0,50);
-  tHit_S->Sumw2(); tHit_S->SetLineColor(kRed); tHit_S->SetLineWidth(2);
+  // TH1F* Edep = new TH1F("Edep","Energy deposit;MeV;Evt",100,low*1000.,high*1000.);
+  // Edep->Sumw2(); Edep->SetLineColor(kBlack); Edep->SetLineWidth(2);
+  // TH1F* Ctime = new TH1F("C_Time","timing of Cerenkov ch.;ns;Evt",600,10,70);
+  // Ctime->Sumw2(); Ctime->SetLineColor(kBlue); Ctime->SetLineWidth(2);
+  // TH1F* Stime = new TH1F("S_Time","timing of Scintillation ch.;ns;Evt",600,10,70);
+  // Stime->Sumw2(); Stime->SetLineColor(kRed); Stime->SetLineWidth(2);
+  // TH1I* Chit = new TH1I("C_Hit","hits of Cerenkov ch",100,0.,3000.);
+  // Chit->Sumw2(); Chit->SetLineColor(kBlue); Chit->SetLineWidth(2);
+  // TH1I* Shit = new TH1I("S_Hit","hits of Scintillation ch",100,0.,40000.);
+  // Shit->Sumw2(); Shit->SetLineColor(kRed); Shit->SetLineWidth(2);
 
-  TH1F* tT_C = new TH1F("time_C","Cerenkov time;ns;p.e.",600,10.,70.);
-  tT_C->Sumw2(); tT_C->SetLineColor(kBlue); tT_C->SetLineWidth(2);
-  TH1F* tT_S = new TH1F("time_S","Scint time;ns;p.e.",600,10.,70.);
-  tT_S->Sumw2(); tT_S->SetLineColor(kRed); tT_S->SetLineWidth(2);
-  TH1F* tWav_S = new TH1F("wavlen_S","Scint wavelength;nm;p.e.",120,300.,900.);
-  tWav_S->Sumw2(); tWav_S->SetLineColor(kRed); tWav_S->SetLineWidth(2);
-  TH1F* tWav_C = new TH1F("wavlen_C","Cerenkov wavelength;nm;p.e.",120,300.,900.);
-  tWav_C->Sumw2(); tWav_C->SetLineColor(kBlue); tWav_C->SetLineWidth(2);
-  TH1F* tNhit_S = new TH1F("nHits_S","Number of Scint p.e./SiPM;p.e.;n",200,0.,200.);
-  tNhit_S->Sumw2(); tNhit_S->SetLineColor(kRed); tNhit_S->SetLineWidth(2);
-  TH1F* tNhit_C = new TH1F("nHits_C","Number of Cerenkov p.e./SiPM;p.e.;n",50,0.,50.);
-  tNhit_C->Sumw2(); tNhit_C->SetLineColor(kBlue); tNhit_C->SetLineWidth(2);
+  // RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>("/d0/scratch/haeun/Sherco/output/v240501/mu_20/test.root", 1);
+  RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>("/u/user/haeun/Sherco/v240501/ShercoSim/install/input/240626/pi_4/pi_4.root", 1);
+  drInterface->set("DRsim","DRsimEventData");
 
   unsigned int entries = drInterface->entries();
-  std::cout << drInterface->entries() << std::endl;
-
   while (drInterface->numEvt() < entries) {
     if (drInterface->numEvt() % 100 == 0) printf("Analyzing %dth event ...\n", drInterface->numEvt());
 
     DRsimInterface::DRsimEventData drEvt;
     drInterface->read(drEvt);
 
-    float Edep = 0.;
+    float ftEdep = 0.;
+
     for (auto edepItr = drEvt.Edeps.begin(); edepItr != drEvt.Edeps.end(); ++edepItr) {
       auto edep = *edepItr;
-      Edep += edep.Edep;
+      ftEdep += edep.Edep;
     }
-    tEdep->Fill(Edep);
 
-    // float Pleak = 0.;
-    // float Eleak_nu = 0.;
-    // for (auto leak : drEvt.leaks) {
-    //   TLorentzVector leak4vec;
-    //   leak4vec.SetPxPyPzE(leak.px,leak.py,leak.pz,leak.E);
-    //   if ( std::abs(leak.pdgId)==12 || std::abs(leak.pdgId)==14 || std::abs(leak.pdgId)==16 ) {
-    //     Eleak_nu += leak4vec.P();
-    //   } else {
-    //     Pleak += leak4vec.P();
-    //   }
-    // }
-    // tP_leak->Fill(Pleak);
-    // tP_leak_nu->Fill(Eleak_nu);
+    int ftC_hits = 0; int ftS_hits = 0;
 
-    int nHitC = 0; int nHitS = 0;
-    for (auto tower = drEvt.towers.begin(); tower != drEvt.towers.end(); ++tower) {
-      int moduleNum = tower->ModuleNum;
-      for (auto sipm = tower->SiPMs.begin(); sipm != tower->SiPMs.end(); ++sipm) {
-        int plateNum = sipm->x; int fiberNum = sipm->y; 
-        if ( RecoInterface::IsCerenkov(sipm->x,sipm->y) ) {
-          tNhit_C->Fill(sipm->count);
-          for (const auto timepair : sipm->timeStruct) {
-            tT_C->Fill(timepair.first.first+0.05,timepair.second);
-            nHitC += timepair.second;
+    for (auto towerItr = drEvt.towers.begin(); towerItr != drEvt.towers.end(); ++towerItr) {
+      auto sipmItr = *towerItr;
+      std::vector<DRsimInterface::DRsimSiPMData> sipmData = sipmItr.SiPMs;
+      int nModule = sipmItr.ModuleNum;
 
-            // if (timepair.first.first < 35) {
-            //   nHitC += timepair.second;
-            //   // t2DhitC->Fill(60*(moduleNum%7)+fiberNum, 60*(moduleNum/7)+plateNum, timepair.second);
-            // }
-          }
-          for (const auto wavpair : sipm->wavlenSpectrum) {
-            tWav_C->Fill(wavpair.first.first,wavpair.second);
-          }
-        } else {
-          tNhit_S->Fill(sipm->count);
-          nHitS += sipm->count;
-          // t2DhitS->Fill(60*(moduleNum%7)+fiberNum, 60*(moduleNum/7)+plateNum, sipm->count);
-          for (const auto timepair : sipm->timeStruct) {
-            tT_S->Fill(timepair.first.first+0.05,timepair.second);
-          }
-          for (const auto wavpair : sipm->wavlenSpectrum) {
-            tWav_S->Fill(wavpair.first.first,wavpair.second);
+      for (int i = 0; i < sipmData.size(); i++) {
+
+        DRsimInterface::DRsimTimeStruct timeItr = sipmData[i].timeStruct;
+
+        for(auto TmpItr = timeItr.begin(); TmpItr != timeItr.end(); ++TmpItr) {
+          auto timeData = *TmpItr;
+          if(DRsimInterface::IsCerenkov(nModule)) {
+            tCtime->Fill((timeData.first.first + timeData.first.second)/2., timeData.second);
+            ftC_hits += timeData.second;
+          } else {
+            tStime->Fill((timeData.first.first + timeData.first.second)/2., timeData.second);
+            ftS_hits += timeData.second;
           }
         }
       }
     }
 
-    tHit_C->Fill(nHitC);
-    tHit_S->Fill(nHitS);
-  } // event loop
-  // drInterface->close();
+    tEdep->Fill(ftEdep);
+    tChit->Fill(ftC_hits);
+    tShit->Fill(ftS_hits);
+  }
 
   TCanvas* c = new TCanvas("c","");
 
-  tEdep->Draw("Hist"); c->SaveAs(outputname+"_Edep.png");
-
-  tHit_C->Draw("Hist"); c->SaveAs(outputname+"_nHitpEventC.png");
-  tHit_S->Draw("Hist"); c->SaveAs(outputname+"_nHitpEventS.png");
-
-  tHit_C->SetBinContent(1, 0.);
-  tHit_S->SetBinContent(1, 0.);
-
-  c->cd(); tHit_C->Draw("Hist"); c->SaveAs(outputname+"_nHitpEventC_bin1to0.png");
-  c->cd(); tHit_S->Draw("Hist"); c->SaveAs(outputname+"_nHitpEventS_bin1to0.png");
-
-
-  tT_C->Draw("Hist"); c->SaveAs(outputname+"_tC.png");
-  tT_S->Draw("Hist"); c->SaveAs(outputname+"_tS.png");
-  tWav_C->Draw("Hist"); c->SaveAs(outputname+"_wavC.png");
-  tWav_S->Draw("Hist"); c->SaveAs(outputname+"_wavS.png");
-  tNhit_C->Draw("Hist"); c->SaveAs(outputname+"_nhitC.png");
-  tNhit_S->Draw("Hist"); c->SaveAs(outputname+"_nhitS.png");
+  tEdep->Draw("Hist"); c->SaveAs("_TotalEdep.png");
+  tChit->Draw("Hist"); c->SaveAs("_TotalChit.png");
+  tShit->Draw("Hist"); c->SaveAs("_TotalShit.png");
+  tCtime->Draw("Hist"); c->SaveAs("_TotalCtime.png");
+  tStime->Draw("Hist"); c->SaveAs("_TotalStime.png");
 }
-
