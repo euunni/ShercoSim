@@ -10,6 +10,7 @@
 #include "TF1.h"
 #include "TPaveStats.h"
 #include "TString.h"
+#include "TLorentzVector.h"
 
 #include <iostream>
 #include <string>
@@ -21,12 +22,15 @@
 
 int main(int argc, char* argv[]) {
 
-  float high = 1.;
+  TString filename = argv[1];
+
+  float high = 10.;
   float low = 0.;
 
   gStyle->SetOptFit(1);
 
-  TH1F* tEdep = new TH1F("Total_Edep","Total Energy deposit;MeV;Evt",100,low,high*3000);
+  // TH1F* tEdep = new TH1F("Total_Edep","Total Energy deposit;MeV;Evt",100,low,high*1000);
+  TH1F* tEdep = new TH1F("Total_Edep","Total Energy deposit;MeV;Evt",100,low,4000.);
   tEdep->Sumw2(); tEdep->SetLineColor(kBlack); tEdep->SetLineWidth(2);
   TH1F* tCtime = new TH1F("Total_C_Time","Total timing of Cerenkov ch.;ns;Evt",150,0,30);
   tCtime->Sumw2(); tCtime->SetLineColor(kBlue); tCtime->SetLineWidth(2);
@@ -34,8 +38,14 @@ int main(int argc, char* argv[]) {
   tStime->Sumw2(); tStime->SetLineColor(kRed); tStime->SetLineWidth(2);
   TH1I* tChit = new TH1I("Total_C_Hit","Total hits of Cerenkov ch",100,0.,1500.);
   tChit->Sumw2(); tChit->SetLineColor(kBlue); tChit->SetLineWidth(2);
-  TH1I* tShit = new TH1I("Total_S_Hit","Total hits of Scintillation ch",100,0.,30000.);
+  TH1I* tShit = new TH1I("Total_S_Hit","Total hits of Scintillation ch",100,0.,60000.);
   tShit->Sumw2(); tShit->SetLineColor(kRed); tShit->SetLineWidth(2);
+  TH1F* tP_leak = new TH1F("Pleak","Momentum leak;MeV;Evt",100,0.,1000.*high);
+  tP_leak->Sumw2(); tP_leak->SetLineWidth(2);
+  // TH1F* tE_leak = new TH1F("Eleak","Energy leak;MeV;Evt",100,0.,1000.*high);
+  // tE_leak->Sumw2(); tE_leak->SetLineWidth(2);
+  TH1F* tP_leak_nu = new TH1F("Pleak_nu","Neutrino energy leak;MeV;Evt",100,0.,1000.*high);
+  tP_leak_nu->Sumw2(); tP_leak_nu->SetLineWidth(2);
 
   // TH1F* Edep = new TH1F("Edep","Energy deposit;MeV;Evt",100,low*1000.,high*1000.);
   // Edep->Sumw2(); Edep->SetLineColor(kBlack); Edep->SetLineWidth(2);
@@ -49,7 +59,7 @@ int main(int argc, char* argv[]) {
   // Shit->Sumw2(); Shit->SetLineColor(kRed); Shit->SetLineWidth(2);
 
   // RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>("/d0/scratch/haeun/Sherco/output/v240501/mu_20/test.root", 1);
-  RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>("/u/user/haeun/Sherco/v240501/ShercoSim/install/input/240626/pi_4/pi_4.root", 1);
+  RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>("/u/user/haeun/Sherco/v240628/ShercoSim/install/input/240717/pi_4GeV_14by5/pi_4.root", 1);
   drInterface->set("DRsim","DRsimEventData");
 
   unsigned int entries = drInterface->entries();
@@ -65,6 +75,23 @@ int main(int argc, char* argv[]) {
       auto edep = *edepItr;
       ftEdep += edep.Edep;
     }
+
+    float Pleak = 0.;
+    // float Eleak = 0.;
+    float Eleak_nu = 0.;
+    for (auto leak : drEvt.leaks) {
+      TLorentzVector leak4vec;
+      leak4vec.SetPxPyPzE(leak.px,leak.py,leak.pz,leak.E);
+      if ( std::abs(leak.pdgId)==12 || std::abs(leak.pdgId)==14 || std::abs(leak.pdgId)==16 ) {
+        Eleak_nu += leak4vec.P();
+      } else {
+        Pleak += leak4vec.P();
+        // Eleak += leak4vec.E();
+      }
+    }
+    tP_leak->Fill(Pleak);
+    // tE_leak->Fill(Eleak);
+    tP_leak_nu->Fill(Eleak_nu);
 
     int ftC_hits = 0; int ftS_hits = 0;
 
@@ -97,9 +124,15 @@ int main(int argc, char* argv[]) {
 
   TCanvas* c = new TCanvas("c","");
 
-  tEdep->Draw("Hist"); c->SaveAs("_TotalEdep.png");
-  tChit->Draw("Hist"); c->SaveAs("_TotalChit.png");
-  tShit->Draw("Hist"); c->SaveAs("_TotalShit.png");
-  tCtime->Draw("Hist"); c->SaveAs("_TotalCtime.png");
-  tStime->Draw("Hist"); c->SaveAs("_TotalStime.png");
+  c->SetLogy(1);
+  tP_leak->Draw("Hist"); c->SaveAs(filename + "_Pleak.png");
+  // tE_leak->Draw("Hist"); c->SaveAs(filename + "_Eleak.png");
+  tP_leak_nu->Draw("Hist"); c->SaveAs(filename + "_Pleak_nu.png");
+  c->SetLogy(0);
+
+  tEdep->Draw("Hist"); c->SaveAs(filename + "_TotalEdep.png");
+  tChit->Draw("Hist"); c->SaveAs(filename + "_TotalChit.png");
+  tShit->Draw("Hist"); c->SaveAs(filename + "_TotalShit.png");
+  tCtime->Draw("Hist"); c->SaveAs(filename + "_TotalCtime.png");
+  tStime->Draw("Hist"); c->SaveAs(filename + "_TotalStime.png");
 }
