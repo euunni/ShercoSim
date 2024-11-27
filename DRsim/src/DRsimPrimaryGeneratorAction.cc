@@ -96,7 +96,7 @@ void DRsimPrimaryGeneratorAction::GeneratePrimaries(G4Event* event) {
 
   fDirection.setREtaPhi(1.,0.,0.);
   fDirection.rotateY( -M_PI * ((90. - fTheta)/180.) );
-  // fDirection.rotateZ( M_PI * (fPhi/180.) );
+  fDirection.rotateZ( M_PI * (fPhi/180.) );
   fDirection.rotateX( -M_PI * (fPhi/180.) );
   fParticleGun->SetParticleMomentumDirection(fDirection);
 
