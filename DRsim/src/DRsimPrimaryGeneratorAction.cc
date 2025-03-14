@@ -35,6 +35,8 @@ void DRsimPrimaryGeneratorAction::initPtcGun() {
   fPhi = 0.;
   fRandX = 10.*mm;
   fRandY = 10.*mm;
+  fRandZ = 10.*mm;
+  fX_0 = 0.;
   fY_0 = 0.;
   fZ_0 = 0.;
   fParticleGun = new G4ParticleGun(1);

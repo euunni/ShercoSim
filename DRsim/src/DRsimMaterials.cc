@@ -428,6 +428,11 @@ void DRsimMaterials::CreateMaterials() {
     0.11, 0.13, 0.15, 0.17, 0.19, 0.20, 0.22, 0.23,
     0.24, 0.25, 0.24, 0.23, 0.21, 0.20, 0.17, 0.14, 0.10
   };
+  // G4double eff_SiPM[nEnt] = {
+  //   0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
+  //   0.00, 0.00, 0.00, 0.00, 0.01, 0.02, 0.03, 0.07,
+  //   0.11, 0.13, 0.17, 0.19, 0.21, 0.21, 0.21, 0.20, 0.19
+  // };
   mpSiPM = new G4MaterialPropertiesTable();
   mpSiPM->AddProperty("REFLECTIVITY",opEn,refl_SiPM,nEnt);
   mpSiPM->AddProperty("EFFICIENCY",opEn,eff_SiPM,nEnt);
