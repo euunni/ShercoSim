@@ -28,7 +28,7 @@ void DRsimSteppingAction::UserSteppingAction(const G4Step* step) {
     if (track->GetCreatorProcess())
       processName = track->GetCreatorProcess()->GetProcessName();
 
-    G4cout << "Track ID : " << track->GetTrackID() << ", Process name : " << processName << ", Logical volume name : " << preVol->GetName() << G4endl;
+    // G4cout << "Track ID : " << track->GetTrackID() << ", Process name : " << processName << ", Logical volume name : " << preVol->GetName() << G4endl;
     
     return;
   } 

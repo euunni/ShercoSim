@@ -48,14 +48,14 @@ G4bool DRsimSiPMSD::ProcessHits(G4Step* step, G4TouchableHistory*) {
 
     bool isCeren = DRsimInterface::IsCerenkov(fModuleNum);
 
-    G4cout << " Hit iteration : " 
-           << i << " " 
-           << SiPMnum << " " 
-           << (*fHitCollection)[i]->GetSiPMnum() << " " 
-           << fModuleNum << " " 
-           << "isCeren : " << isCeren << " "
-           << (*fHitCollection)[i]->GetModuleNum() << " "
-           << G4endl;
+    // G4cout << " Hit iteration : " 
+    //        << i << " " 
+    //        << SiPMnum << " " 
+    //        << (*fHitCollection)[i]->GetSiPMnum() << " " 
+    //        << fModuleNum << " " 
+    //        << "isCeren : " << isCeren << " "
+    //        << (*fHitCollection)[i]->GetModuleNum() << " "
+    //        << G4endl;
            
     if ( (*fHitCollection)[i]->GetSiPMnum() == SiPMnum) {
     // if ( (*fHitCollection)[i]->GetSiPMnum() == SiPMnum && (*fHitCollection)[i]->GetModuleNum() == fModuleNum ) {
@@ -90,10 +90,10 @@ void DRsimSiPMSD::EndOfEvent(G4HCofThisEvent*) {
   
   if ( verboseLevel>1 ) {
     G4int nofHits = fHitCollection->entries();
-    G4cout
-    << G4endl
-    << "-------->Hits Collection: in this event they are " << nofHits
-    << " hits in the tracker chambers: " << G4endl;
+    // G4cout
+    // << G4endl
+    // << "-------->Hits Collection: in this event they are " << nofHits
+    // << " hits in the tracker chambers: " << G4endl;
     for ( G4int i=0; i<nofHits; i++ ) (*fHitCollection)[i]->Print();
   }
 }
