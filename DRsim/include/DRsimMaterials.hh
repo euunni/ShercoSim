@@ -41,6 +41,7 @@ private:
   G4Material* fWater;
   G4OpticalSurface* fAlSurf;
   G4OpticalSurface* fSiPMSurf;
+  G4OpticalSurface* fPMTSurf;
   G4OpticalSurface* fFilterSurf;
   G4OpticalSurface* fMirrorSurf;
 };

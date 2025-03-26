@@ -37,7 +37,8 @@ G4Material* DRsimMaterials::GetMaterial(const G4String matName) {
 }
 
 G4OpticalSurface* DRsimMaterials::GetOpticalSurface(const G4String surfName) {
-  if (surfName == "PMTsurf") return fSiPMSurf;
+  if (surfName == "SiPMsurf") return fSiPMSurf;
+  if (surfName == "PMTsurf") return fPMTSurf;
   else if (surfName == "FilterSurf") return fFilterSurf;
   else if (surfName == "MirrorSurf") return fMirrorSurf;
   else if (surfName == "AlSurf") return fAlSurf;
@@ -63,27 +64,6 @@ void DRsimMaterials::CreateMaterials() {
   G4Element* O  = new G4Element("Oxygen"  ,symbol="O" , z=8., a=16.00*g/mole);
   G4Element* F  = new G4Element("Fluorine",symbol="F" , z=9., a=18.9984*g/mole);
 
-  // Ver 1.
-
-  // Lab
-  // G4int fNofC;
-  // G4int fNofH;
-  // char fName[20];
-
-  // for ( int i = 0; i < 6; i++ ) {
-  //   fNofC = i + 15;
-  //   fNofH = 2 * (i + 9) + 6;
-  //   fLAB[i] = new G4Material(fName, density=0.863*g/cm3, 2);
-  //   fLAB[i]->AddElement(C, fNofC);
-  //   fLAB[i]->AddElement(H, fNofH);
-  //   fLAB[i]->SetChemicalFormula("AROMATIC");
-    
-  //   G4double fLABMol = C->GetA()*fNofC + H->GetA()*fNofH;
-  //   G4MaterialPropertiesTable* mpLAB = new G4MaterialPropertiesTable();
-  //   mpLAB->AddConstProperty("LABMol", fLABMol/g);
-  //   fLAB[i]->SetMaterialPropertiesTable(mpLAB);
-  // }
-
   // PPO
   fPPO = new G4Material("PPO", density=1.094*g/cm3, 4);
   fPPO->SetChemicalFormula("FLUOR");
@@ -97,7 +77,7 @@ void DRsimMaterials::CreateMaterials() {
   mpPPO->AddConstProperty("PPOMol", fPPOMol/g);
   fPPO->SetMaterialPropertiesTable(mpPPO);
 
-  // // Bis-MSB
+  // Bis-MSB
   fBisMSB = new G4Material("Bis-MSB", density=1.3*g/cm3, 2);
   fBisMSB->SetChemicalFormula("WLS"); // Wavelength Shifter
   fBisMSB->AddElement(C, 24);
@@ -107,24 +87,8 @@ void DRsimMaterials::CreateMaterials() {
   G4MaterialPropertiesTable* mpBisMSB = new G4MaterialPropertiesTable();
   mpBisMSB->AddConstProperty("BisMol", fBisMol/g);
   fBisMSB->SetMaterialPropertiesTable(mpBisMSB);
-
-  // LS
-  // G4double fLSdensity =  0.865*g/cm3;
-  // fLS = new G4Material("LS", fLSdensity, 8);
-  // G4double fPPOFrac = 3*g / (1e3*cm3 * fLSdensity);
-  // G4double fBisFrac = 0.03*g / (1e3*cm3 * fLSdensity);
   
-  // fLS->AddMaterial(fLAB[0], 0.0047 / (1.0 + fPPOFrac + fBisFrac));
-  // fLS->AddMaterial(fLAB[1], 0.097 / (1.0 + fPPOFrac + fBisFrac));
-  // fLS->AddMaterial(fLAB[2], 0.3385 / (1.0 + fPPOFrac + fBisFrac));
-  // fLS->AddMaterial(fLAB[3], 0.3472 / (1.0 + fPPOFrac + fBisFrac));
-  // fLS->AddMaterial(fLAB[4], 0.2083 / (1.0 + fPPOFrac + fBisFrac));
-  // fLS->AddMaterial(fLAB[5], 0.0043 / (1.0 + fPPOFrac + fBisFrac));
-  // fLS->AddMaterial(fBisMSB, fBisFrac / (1.0 + fPPOFrac + fBisFrac));
-
-  // Ver 2. 
-  
-  // LS
+  // LAB
   fLAB = new G4Material("LAB", density=0.863*g/cm3, 4, kStateLiquid);
   fLAB->AddElement(C, 6);
   fLAB->AddElement(H, 5);
@@ -136,16 +100,7 @@ void DRsimMaterials::CreateMaterials() {
   mpLAB->AddConstProperty("LABMol", fLABMol/g);
   fLAB->SetMaterialPropertiesTable(mpLAB);
 
-  // fPPO = new G4Material("PPO", density=1.094*g/cm3, 4, kStateLiquid);
-  // fPPO->AddElement(C, 15);
-  // fPPO->AddElement(H, 11);
-  // fPPO->AddElement(N, 1);
-  // fPPO->AddElement(O, 1);
-
-  // fBisMSB = new G4Material("BisMSB", density=1.3*g/cm3, 2, kStateLiquid);
-  // fBisMSB->AddElement(C, 24);
-  // fBisMSB->AddElement(H, 22);
-
+  // LS
   fLS = new G4Material("LS", density=0.865*g/cm3, 3, kStateLiquid);
   fLS->AddMaterial(fLAB, 99.697*perCent);
   fLS->AddMaterial(fPPO, 0.3*perCent);
@@ -196,6 +151,7 @@ void DRsimMaterials::CreateMaterials() {
   G4MaterialPropertiesTable* mpFluoPoly;
   G4MaterialPropertiesTable* mpGlass;
   G4MaterialPropertiesTable* mpSiPM;
+  G4MaterialPropertiesTable* mpPMT;
   G4MaterialPropertiesTable* mpFilter;
   G4MaterialPropertiesTable* mpFilterSurf;
   G4MaterialPropertiesTable* mpMirror;
@@ -203,79 +159,6 @@ void DRsimMaterials::CreateMaterials() {
   G4MaterialPropertiesTable* mpLS;
   G4MaterialPropertiesTable* mpWater;
   G4MaterialPropertiesTable* mpAlSurf;
-
-// **************
-
-  // // LS Refractive Index
-  // G4double opEn_RI_LS[] = { // from 800nm to 200nm with 100nm step
-  //   1.54980*eV, 1.77120*eV, 2.06640*eV, 2.47968*eV, 3.09960*eV, 4.13281*eV, 6.19921*eV
-  // };
-
-  // const G4int RIEnt_LS = sizeof(opEn_RI_LS) / sizeof(G4double);
-
-  // G4double RI_LS[RIEnt_LS] = { 
-  //   1.47571, 1.47871, 1.48334, 1.49107, 1.50541, 1.53694, 1.63112
-  // };
-
-  // // LS Absorption Length
-  // G4double waveLen_LS, AbsLen_LS_tmp;
-  // std::vector<G4double> opEn_Abs_LS;
-  // std::vector<G4double> AbsLen_LS;
-
-  // std::ifstream in;
-  // in.open("AbsLength_LS.txt", std::ios::in);
-  
-  // while (true) { // wavelength[nm] * opEn[eV] = 1,239.84
-  //   in >> waveLen_LS >> AbsLen_LS_tmp;
-    
-  //   if ( !in.good() )
-  //     break;
-
-  //   opEn_Abs_LS.push_back((1239.84/waveLen_LS)*eV); // Unit : eV
-  //   AbsLen_LS.push_back((AbsLen_LS_tmp/1000.)*m); // Unit : m 
-  // }
-  // in.close();
-
-  // std::reverse(opEn_Abs_LS.begin(), opEn_Abs_LS.end());
-  // std::reverse(AbsLen_LS.begin(), AbsLen_LS.end());
-
-  // const G4int AbsEnt_LS = AbsLen_LS.size();
-
-  // G4double waveLenForFast_LS, FastCom_LS_tmp;
-  // std::vector<G4double> opEn_FastCom_LS;
-  // std::vector<G4double> FastCom_LS;
-
-  // std::ifstream in2;
-  // in2.open("FastComponent_LS.txt", std::ios::in);
-  
-  // while (true) { // wavelength[nm] * opEn[eV] = 1,239.84
-  //   in2 >> waveLenForFast_LS >> FastCom_LS_tmp;
-    
-  //   if ( !in2.good() )
-  //     break;
-
-  //   opEn_FastCom_LS.push_back((1239.84/waveLenForFast_LS)*eV); // Unit : eV
-  //   FastCom_LS.push_back((FastCom_LS_tmp/1000.)*m); // Unit : m 
-  // }
-  // in2.close();
-
-  // std::reverse(opEn_FastCom_LS.begin(), opEn_FastCom_LS.end());
-  // std::reverse(FastCom_LS.begin(), FastCom_LS.end());
-
-  // const G4int FastEnt_LS = FastCom_LS.size();
-
-  // mpLS = new G4MaterialPropertiesTable();
-  // mpLS->AddProperty("RINDEX",opEn_RI_LS,RI_LS,RIEnt_LS);
-  // mpLS->AddProperty("ABSLENGTH",&(opEn_Abs_LS[0]),&(AbsLen_LS[0]),AbsEnt_LS);
-  // mpLS->AddProperty("FASTCOMPONENT",&(opEn_FastCom_LS[0]),&(FastCom_LS[0]),FastEnt_LS);
-  // // mpLS->AddProperty("FASTCOMPONENT",opEn,scintFast_LS,nEnt);
-  // mpLS->AddConstProperty("SCINTILLATIONYIELD",9656./MeV);
-  // mpLS->AddConstProperty("RESOLUTIONSCALE",1.0);
-  // mpLS->AddConstProperty("SCINTILLATIONTIMECONSTANT",2.0*ns); // example
-  // fLS->SetMaterialPropertiesTable(mpLS);
-  // fLS->GetIonisation()->SetBirksConstant(0.117*mm/MeV);
-
-// **********
 
   G4double opEn[] = { // from 900nm to 300nm with 25nm step
     1.37760*eV, 1.41696*eV, 1.45864*eV, 1.50284*eV, 1.54980*eV, 1.59980*eV, 1.65312*eV, 1.71013*eV,
@@ -319,7 +202,6 @@ void DRsimMaterials::CreateMaterials() {
   mpLS->AddConstProperty("RESOLUTIONSCALE",1.0);
   fLS->SetMaterialPropertiesTable(mpLS);
   fLS->GetIonisation()->SetBirksConstant(0.117*mm/MeV);
-
 
   // Water Refractive Index
   G4double opEn_RI_Water[] = { // from 800nm to 200nm with 50nm step
@@ -428,16 +310,24 @@ void DRsimMaterials::CreateMaterials() {
     0.11, 0.13, 0.15, 0.17, 0.19, 0.20, 0.22, 0.23,
     0.24, 0.25, 0.24, 0.23, 0.21, 0.20, 0.17, 0.14, 0.10
   };
-  // G4double eff_SiPM[nEnt] = {
-  //   0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
-  //   0.00, 0.00, 0.00, 0.00, 0.01, 0.02, 0.03, 0.07,
-  //   0.11, 0.13, 0.17, 0.19, 0.21, 0.21, 0.21, 0.20, 0.19
-  // };
+
   mpSiPM = new G4MaterialPropertiesTable();
   mpSiPM->AddProperty("REFLECTIVITY",opEn,refl_SiPM,nEnt);
   mpSiPM->AddProperty("EFFICIENCY",opEn,eff_SiPM,nEnt);
-  fSiPMSurf = new G4OpticalSurface("PMTsurf",glisur,polished,dielectric_metal);
+  fSiPMSurf = new G4OpticalSurface("SiPMsurf",glisur,polished,dielectric_metal);
   fSiPMSurf->SetMaterialPropertiesTable(mpSiPM);
+
+  G4double refl_PMT[nEnt]; std::fill_n(refl_PMT, nEnt, 0.);
+  G4double eff_PMT[nEnt] = {
+    0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00,
+    0.00, 0.00, 0.01, 0.01, 0.02, 0.04, 0.07, 0.12,
+    0.20, 0.24, 0.29, 0.33, 0.34, 0.35, 0.35, 0.33, 0.29
+  };
+  mpPMT = new G4MaterialPropertiesTable();
+  mpPMT->AddProperty("REFLECTIVITY",opEn,refl_PMT,nEnt);
+  mpPMT->AddProperty("EFFICIENCY",opEn,eff_PMT,nEnt);
+  fPMTSurf = new G4OpticalSurface("PMTSurf",glisur,polished,dielectric_metal);
+  fPMTSurf->SetMaterialPropertiesTable(mpPMT);
 
   G4double filterEff[nEnt] = {
     0.913, 0.913, 0.913, 0.913, 0.913, 0.913, 0.913, 0.913, 
