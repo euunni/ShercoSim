@@ -1,14 +1,12 @@
 #!/bin/sh
 
 # particle=("e-" "mu-" "pi-" "proton")
-
 for i in "e-"
 # particle names(e-, pi-)
 do
     run_beamOn="2"
 
-    for j in 20
-    # energy with the unit of GeV.
+    for j in 20 # energy [GeV]
     do
         beamAngle=("90,0")
 
@@ -32,7 +30,7 @@ do
             root_name="${macroname}"
 
             ########################################################
-            results="/u/user/haeun/scratch/Sherco/v250314/ele/test/woAbstxt/$root_name"            
+            results="/Your/Path/$root_name"            
             ########################################################
 
             echo "starting submit for $gun_energy $gun_particle and the output will be $root_name.root"   
