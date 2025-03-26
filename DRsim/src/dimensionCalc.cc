@@ -42,7 +42,7 @@ G4ThreeVector dimensionCalc::GetOrigin(G4int i) {
   return G4ThreeVector( // for rotation with 90 deg on z-axis 
                         -fModuleWidth  * (double)fNofRow/2. + col * fModuleWidth  + fModuleWidth/2.,
                         -fModuleHeight * (double)fNofCol/2. + row * fModuleHeight + fModuleHeight/2., 
-                        0
+                        0.
                       );
 }
 
