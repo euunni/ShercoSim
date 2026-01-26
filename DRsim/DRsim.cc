@@ -2,11 +2,7 @@
 #include "DRsimDetectorConstruction.hh"
 #include "DRsimActionInitialization.hh"
 
-#ifdef G4MULTITHREADED
-#include "G4MTRunManager.hh"
-#else
-#include "G4RunManager.hh"
-#endif
+#include "G4RunManagerFactory.hh"
 
 #include "G4UImanager.hh"
 #include "G4OpticalPhysics.hh"
@@ -37,11 +33,7 @@ int main(int argc, char** argv) {
   CLHEP::HepRandom::setTheSeed(seed);
 
   // Construct the default run manager
-  #ifdef G4MULTITHREADED
-  G4MTRunManager* runManager = new G4MTRunManager;
-  #else
-  G4RunManager* runManager = new G4RunManager;
-  #endif
+  auto* runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
 
   // Mandatory user initialization classes
   runManager->SetUserInitialization(new DRsimDetectorConstruction());

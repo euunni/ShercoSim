@@ -9,9 +9,9 @@ project(DRsim)
 #
 option(WITH_GEANT4_UIVIS "Build example with Geant4 UI and Vis drivers" OFF)
 if(WITH_GEANT4_UIVIS)
-  find_package(Geant4 REQUIRED ui_all vis_all)
+  find_package(Geant4 CONFIG REQUIRED ui_all vis_all)
 else()
-  find_package(Geant4 REQUIRED)
+  find_package(Geant4 CONFIG REQUIRED)
 endif()
 
 #----------------------------------------------------------------------------
@@ -44,10 +44,8 @@ target_link_libraries(
 )
 
 file(GLOB DRsim_MACROS ${PROJECT_SOURCE_DIR}/*.mac)
-file(GLOB LS_ABS ${PROJECT_SOURCE_DIR}/AbsLength_LS.txt)
 
 file(COPY ${DRsim_MACROS} DESTINATION ${PROJECT_BINARY_DIR})
-file(COPY ${LS_ABS} DESTINATION ${PROJECT_BINARY_DIR})
 
 #----------------------------------------------------------------------------
 # Add program to the project targets
@@ -60,4 +58,3 @@ file(COPY ${LS_ABS} DESTINATION ${PROJECT_BINARY_DIR})
 #
 install(TARGETS DRsim DESTINATION bin)
 install(FILES ${DRsim_MACROS} DESTINATION .)
-install(FILES ${LS_ABS} DESTINATION .)

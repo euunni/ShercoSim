@@ -29,6 +29,12 @@ int main(int argc, char* argv[]) {
   TString filename = argv[1];
   float low = std::stof(argv[2]);
   float high = std::stof(argv[3]);
+  bool useCalib = true;
+  if (argc > 4) {
+    std::string opt = argv[4];
+    if (opt == "0") useCalib = false;
+    else if (opt == "1") useCalib = true;
+  }
 
   const int row = 27; 
   const int col = 27;
@@ -39,18 +45,27 @@ int main(int argc, char* argv[]) {
   double ceren_cc, scint_cc;
   std::pair<double, double> fCalibs;
 
-  std::ifstream in;
-  in.open("calib.csv", std::ios::in);
-  while (true) {
+  if (!useCalib) {
+    fCalibs = std::make_pair(1.0, 1.0);
+  } else {
+    std::ifstream in;
+    in.open("calib.csv", std::ios::in);
+    bool readOk = false;
+    while (true) {
 
-    in >> ceren_cc >> scint_cc;
+      in >> ceren_cc >> scint_cc;
 
-    if ( !in.good() )
-      break;
+      if ( !in.good() )
+        break;
 
-    fCalibs = std::make_pair(ceren_cc, scint_cc);
+      fCalibs = std::make_pair(ceren_cc, scint_cc);
+      readOk = true;
+    }
+    in.close();
+    if (!readOk) {
+      fCalibs = std::make_pair(1.0, 1.0);
+    }
   }
-  in.close();
 
 
   TH1F* tEdep = new TH1F("Total_Edep","Total Energy deposit;MeV;Evt",100,low*1000.,high*1000.);
@@ -279,10 +294,6 @@ int main(int argc, char* argv[]) {
   tHits_2D->GetYaxis()->SetLabelFont(42);
   tE_2D->GetXaxis()->SetLabelFont(42);
   tE_2D->GetYaxis()->SetLabelFont(42);
-
-  // For 4 by 5
-  // c->SetCanvasSize(1200,1200);
-  // tEdep_2D->SetMarkerSize(1.2);
 
   // For 27 by 27
   c->SetCanvasSize(1800,1400);
