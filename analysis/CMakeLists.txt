@@ -4,7 +4,6 @@ find_package(ROOT REQUIRED)
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${HEPMC_DIR}/include
 )
 file(GLOB sources
   ${PROJECT_SOURCE_DIR}/src/*.cc
@@ -19,8 +18,6 @@ add_executable(analysis analysis.cc ${sources} ${headers})
 # add_executable(calib calib.cc ${sources} ${headers})
 target_link_libraries(
   analysis
-  ${HEPMC_DIR}/lib64/libHepMC3.so
-  ${HEPMC_DIR}/lib64/libHepMC3rootIO.so
   rootIO
   ${ROOT_LIBRARIES}
   ${CMAKE_DL_LIBS}

@@ -80,14 +80,7 @@ void DRsimPrimaryGeneratorAction::GeneratePrimaries(G4Event* event) {
     return;
   }
 
-  if (fUseHepMC) {
-    G4AutoLock lock(&DRsimPrimaryGeneratorMutex);
-    DRsimRunAction::sHepMCreader->GeneratePrimaryVertex(event);
-    sIdxEvt = sNumEvt;
-    sNumEvt++;
-
-    return;
-  }
+  // HepMC input disabled in this configuration
 
   G4double x = (G4UniformRand()-0.5)*fRandX + fX_0;
   G4double y = (G4UniformRand()-0.5)*fRandY + fY_0;
