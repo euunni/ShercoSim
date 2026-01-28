@@ -74,7 +74,7 @@ void DRsimMaterials::CreateMaterials() {
 
   G4double fPPOMol = C->GetA()*15 + H->GetA()*11 + N->GetA()*1 + O->GetA()*1;
   G4MaterialPropertiesTable* mpPPO = new G4MaterialPropertiesTable();
-  mpPPO->AddConstProperty("PPOMol", fPPOMol/g, true);
+  mpPPO->AddConstProperty("PPOMol", fPPOMol/g);
   fPPO->SetMaterialPropertiesTable(mpPPO);
 
   // Bis-MSB
@@ -85,7 +85,7 @@ void DRsimMaterials::CreateMaterials() {
 
   G4double fBisMol = C->GetA()*24 + H->GetA()*22;
   G4MaterialPropertiesTable* mpBisMSB = new G4MaterialPropertiesTable();
-  mpBisMSB->AddConstProperty("BisMol", fBisMol/g, true);
+  mpBisMSB->AddConstProperty("BisMol", fBisMol/g);
   fBisMSB->SetMaterialPropertiesTable(mpBisMSB);
   
   // LAB
@@ -97,7 +97,7 @@ void DRsimMaterials::CreateMaterials() {
   
   G4double fLABMol = C->GetA()*18 + H->GetA()*30;
   G4MaterialPropertiesTable* mpLAB = new G4MaterialPropertiesTable();
-  mpLAB->AddConstProperty("LABMol", fLABMol/g, true);
+  mpLAB->AddConstProperty("LABMol", fLABMol/g);
   fLAB->SetMaterialPropertiesTable(mpLAB);
 
   // LS
@@ -195,9 +195,11 @@ void DRsimMaterials::CreateMaterials() {
   mpLS = new G4MaterialPropertiesTable();
   mpLS->AddProperty("RINDEX", opEn, RI_LS, nEnt);
   mpLS->AddProperty("ABSLENGTH",opEn,AbsLen_LS,nEnt);
-  mpLS->AddProperty("FASTCOMPONENT",opEn,scintFast_LS,nEnt);
+  // Geant4 11.x: use SCINTILLATIONCOMPONENT1 instead of FASTCOMPONENT
+  mpLS->AddProperty("SCINTILLATIONCOMPONENT1",opEn,scintFast_LS,nEnt);
   mpLS->AddProperty("WLSCOMPONENT", opEn,reemit_LS,nEnt);
-  mpLS->AddConstProperty("FASTTIMECONSTANT", 2.0*ns);
+  // Geant4 11.x: use SCINTILLATIONTIMECONSTANT1 instead of FASTTIMECONSTANT
+  mpLS->AddConstProperty("SCINTILLATIONTIMECONSTANT1", 2.0*ns);
   mpLS->AddConstProperty("SCINTILLATIONYIELD", 9656./MeV);
   mpLS->AddConstProperty("RESOLUTIONSCALE",1.0);
   fLS->SetMaterialPropertiesTable(mpLS);
@@ -289,10 +291,12 @@ void DRsimMaterials::CreateMaterials() {
   mpPS = new G4MaterialPropertiesTable();
   mpPS->AddProperty("RINDEX",opEn,RI_PS,nEnt);
   mpPS->AddProperty("ABSLENGTH",opEn,AbsLen_PS,nEnt);
-  mpPS->AddProperty("FASTCOMPONENT",opEn,scintFast_PS,nEnt);
+  // Geant4 11.x: use SCINTILLATIONCOMPONENT1 instead of FASTCOMPONENT
+  mpPS->AddProperty("SCINTILLATIONCOMPONENT1",opEn,scintFast_PS,nEnt);
   mpPS->AddConstProperty("SCINTILLATIONYIELD",10./keV);
   mpPS->AddConstProperty("RESOLUTIONSCALE",1.0);
-  mpPS->AddConstProperty("FASTTIMECONSTANT",2.8*ns);
+  // Geant4 11.x: use SCINTILLATIONTIMECONSTANT1 instead of FASTTIMECONSTANT
+  mpPS->AddConstProperty("SCINTILLATIONTIMECONSTANT1",2.8*ns);
   fPS->SetMaterialPropertiesTable(mpPS);
   fPS->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
 
