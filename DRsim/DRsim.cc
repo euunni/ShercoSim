@@ -6,6 +6,7 @@
 
 #include "G4UImanager.hh"
 #include "G4OpticalPhysics.hh"
+#include "G4OpticalParameters.hh"
 #include "FTFP_BERT.hh"
 #include "Randomize.hh"
 
@@ -42,10 +43,11 @@ int main(int argc, char** argv) {
   G4VModularPhysicsList* physicsList = new FTFP_BERT;
   G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
   physicsList->RegisterPhysics(opticalPhysics);
-  opticalPhysics->Configure(kCerenkov, true);
-  opticalPhysics->Configure(kScintillation, true);
-  opticalPhysics->SetTrackSecondariesFirst(kCerenkov, true);
-  opticalPhysics->SetTrackSecondariesFirst(kScintillation, true);
+  auto* optParams = G4OpticalParameters::Instance();
+  optParams->SetCerenkovEnabled(true);
+  optParams->SetScintillationEnabled(true);
+  optParams->SetCerenkovTrackSecondariesFirst(true);
+  optParams->SetScintillationTrackSecondariesFirst(true);
   runManager->SetUserInitialization(physicsList);
 
   // User action initialization
