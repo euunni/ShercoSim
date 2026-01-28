@@ -4,7 +4,6 @@ find_package(ROOT REQUIRED)
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${FASTJET_DIR}/include
   ${HEPMC_DIR}/include
 )
 file(GLOB sources
