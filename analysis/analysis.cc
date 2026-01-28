@@ -29,11 +29,11 @@ int main(int argc, char* argv[]) {
   TString filename = argv[1];
   float low = std::stof(argv[2]);
   float high = std::stof(argv[3]);
-  bool useCalib = true;
+  bool doCalib = false;
   if (argc > 4) {
     std::string opt = argv[4];
-    if (opt == "0") useCalib = false;
-    else if (opt == "1") useCalib = true;
+    if (opt == "1") doCalib = true;
+    else if (opt == "0") doCalib = false;
   }
 
   const int row = 27; 
@@ -44,20 +44,15 @@ int main(int argc, char* argv[]) {
 
   double ceren_cc, scint_cc;
   std::pair<double, double> fCalibs;
-
-  if (!useCalib) {
+  if (!doCalib) {
     fCalibs = std::make_pair(1.0, 1.0);
   } else {
     std::ifstream in;
     in.open("calib.csv", std::ios::in);
     bool readOk = false;
     while (true) {
-
       in >> ceren_cc >> scint_cc;
-
-      if ( !in.good() )
-        break;
-
+      if ( !in.good() ) break;
       fCalibs = std::make_pair(ceren_cc, scint_cc);
       readOk = true;
     }
@@ -70,6 +65,10 @@ int main(int argc, char* argv[]) {
 
   TH1F* tEdep = new TH1F("Total_Edep","Total Energy deposit;MeV;Evt",100,low*1000.,high*1000.);
   tEdep->Sumw2(); tEdep->SetLineColor(kBlack); tEdep->SetLineWidth(2);
+  TH1F* tEdep_C = new TH1F("Total_Edep_C","Total Energy deposit (C truth);MeV;Evt",100,low*1000.,high*1000.);
+  tEdep_C->Sumw2(); tEdep_C->SetLineWidth(2);
+  TH1F* tEdep_S = new TH1F("Total_Edep_S","Total Energy deposit (S truth);MeV;Evt",100,low*1000.,high*1000.);
+  tEdep_S->Sumw2(); tEdep_S->SetLineWidth(2);
   TH1F* tE_C = new TH1F("E_C","Energy of Cerenkov.;GeV;Evt",100,low,high);
   tE_C->Sumw2(); tE_C->SetLineColor(kBlue); tE_C->SetLineWidth(2);
   TH1F* tE_S = new TH1F("E_S","Energy of Scintillation.;GeV;Evt",100,low,high);
@@ -106,11 +105,11 @@ int main(int argc, char* argv[]) {
     tHits_Towers[i] = new TH1F(nameHits, ";Npe;Evt", 1000, 0., 1000000.);
   }
 
-  RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>("/Your/Path/ele_" + std::string(filename) + ".root", 1);
+  RootInterface<DRsimInterface::DRsimEventData>* drInterface = new RootInterface<DRsimInterface::DRsimEventData>("./input/260128_Calib/20GeV/ele_" + std::string(filename) + ".root", 1);
   drInterface->set("DRsim","DRsimEventData");
 
-  unsigned int entries = drInterface->entries();
-  // unsigned int entries = 3000;
+  // unsigned int entries = drInterface->entries();
+  unsigned int entries = 3000;
   while (drInterface->numEvt() < entries) {
 
     if (drInterface->numEvt() % 100 == 0) printf("Analyzing %dth event ...\n", drInterface->numEvt());
@@ -119,6 +118,8 @@ int main(int argc, char* argv[]) {
     drInterface->read(drEvt);
 
     float ftEdep = 0.;
+    float ftEdepC = 0.;
+    float ftEdepS = 0.;
     float Edep_Towers[numModule] = {0};
     float hits_Towers[numModule] = {0};
     float E_Towers[numModule] = {0};
@@ -128,6 +129,11 @@ int main(int argc, char* argv[]) {
       ftEdep += edep.Edep;
 
       int moduleNum = edep.ModuleNum;
+      if (DRsimInterface::IsCerenkov(moduleNum)) {
+        ftEdepC += edep.Edep;
+      } else {
+        ftEdepS += edep.Edep;
+      }
       Edep_Towers[moduleNum] += edep.Edep;
     }
 
@@ -185,6 +191,8 @@ int main(int argc, char* argv[]) {
     tE_S->Fill(energy_S);
     tE_SC->Fill(energy_C + energy_S);
     tEdep->Fill(ftEdep);
+    tEdep_C->Fill(ftEdepC);
+    tEdep_S->Fill(ftEdepS);
     tChit->Fill(ftC_hits);
     tShit->Fill(ftS_hits);
     tEdep_oneTower->Fill(Edep_Towers[351]);
@@ -220,14 +228,16 @@ int main(int argc, char* argv[]) {
   });
 
   std::ofstream outEdep;
-  outEdep.open("/Your/Path/ele_" + filename + "_Edep.csv", std::ios::out | std::ios::app);
+  outEdep.open("./plot/260128_Calib/20GeV/ele_" + filename + "_Edep.csv", std::ios::out | std::ios::app);
   outEdep << "Total Edep : " << tEdep->GetMean() << " MeV" << std::endl;
+  outEdep << "Total Edep_C : " << tEdep_C->GetMean() << " MeV" << std::endl;
+  outEdep << "Total Edep_S : " << tEdep_S->GetMean() << " MeV" << std::endl;
   for (const auto& itr : dataEdep) {
     outEdep << "Module_" << (itr.first) << " " << itr.second << std::endl;
   }
 
   std::ofstream outHits;
-  outHits.open("/Your/Path/ele_" + filename + "_Hits.csv", std::ios::out | std::ios::app);
+  outHits.open("./plot/260128_Calib/20GeV/ele_" + filename + "_Hits.csv", std::ios::out | std::ios::app);
   outHits << "Total Chits : " << tChit->GetMean() << std::endl;
   outHits << "Total Shits : " << tShit->GetMean() << std::endl;
   for (const auto& itr : dataHits) {
@@ -238,51 +248,57 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  TFile* file = new TFile("/Your/Path/ele_" + filename + ".root", "RECREATE");
+  TFile* file = new TFile("./plot/260128_Calib/20GeV/ele_" + filename + ".root", "RECREATE");
   TCanvas* c = new TCanvas("c","");
 
   c->SetLogy(1);
-  tP_leak->Draw("Hist"); c->SaveAs("/Your/Path/ele_" + filename + "_Pleak.png");
-  tP_leak_nu->Draw("Hist"); c->SaveAs("/Your/Path/ele_" + filename + "_Pleak_nu.png");
+  tP_leak->Draw("Hist"); c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_Pleak.png");
+  tP_leak_nu->Draw("Hist"); c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_Pleak_nu.png");
   c->SetLogy(0);
 
-  tEdep->Draw("Hist"); c->SaveAs("/Your/Path/ele_" + filename + "_TotalEdep.png");
-  tE_C->Draw("Hist"); c->SaveAs("/Your/Path/ele_" + filename + "_TotalE_C.png");
-  tE_S->Draw("Hist"); c->SaveAs("/Your/Path/ele_" + filename + "_TotalE_S.png");
-  tChit->Draw("Hist"); c->SaveAs("/Your/Path/ele_" + filename + "_TotalChit.png");
-  tShit->Draw("Hist"); c->SaveAs("/Your/Path/ele_" + filename + "_TotalShit.png");
-  tCtime->Draw("Hist"); c->SaveAs("/Your/Path/ele_" + filename + "_TotalCtime.png");
-  tStime->Draw("Hist"); c->SaveAs("/Your/Path/ele_" + filename + "_TotalStime.png");
+  tEdep->Draw("Hist"); c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_TotalEdep.png");
+  if (doCalib) {
+    tE_C->Draw("Hist"); c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_TotalE_C.png");
+    tE_S->Draw("Hist"); c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_TotalE_S.png");
+  }
+  tChit->Draw("Hist"); c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_TotalChit.png");
+  tShit->Draw("Hist"); c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_TotalShit.png");
+  tCtime->Draw("Hist"); c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_TotalCtime.png");
+  tStime->Draw("Hist"); c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_TotalStime.png");
 
-  tE_C->Write();
-  tE_S->Write();
-  tE_SC->Write();
+  if (doCalib) {
+    tE_C->Write();
+    tE_S->Write();
+    tE_SC->Write();
+  }
 
-  TF1* grE_C = new TF1("Cfit","gaus",low,high); grE_C->SetLineColor(kBlue);
-  TF1* grE_S = new TF1("Sfit","gaus",low,high); grE_S->SetLineColor(kRed);
-  TF1* grE_SC = new TF1("S+Cfit","gaus",2.*low,2.*high); grE_SC->SetLineColor(kBlack);
-  tE_C->SetOption("p"); tE_C->Fit(grE_C,"R+&same");
-  tE_S->SetOption("p"); tE_S->Fit(grE_S,"R+&same");
-  tE_SC->SetOption("p"); tE_SC->Fit(grE_SC,"R+&same");
+  if (doCalib) {
+    TF1* grE_C = new TF1("Cfit","gaus",low,high); grE_C->SetLineColor(kBlue);
+    TF1* grE_S = new TF1("Sfit","gaus",low,high); grE_S->SetLineColor(kRed);
+    TF1* grE_SC = new TF1("S+Cfit","gaus",2.*low,2.*high); grE_SC->SetLineColor(kBlack);
+    tE_C->SetOption("p"); tE_C->Fit(grE_C,"R+&same");
+    tE_S->SetOption("p"); tE_S->Fit(grE_S,"R+&same");
+    tE_SC->SetOption("p"); tE_SC->Fit(grE_SC,"R+&same");
 
-  tE_SC->Draw(""); c->SaveAs("/Your/Path/ele_" + filename + "_TotalE_SC.png");
+    tE_SC->Draw(""); c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_TotalE_SC.png");
 
-  c->cd();
-  tE_S->SetTitle("");
-  tE_S->Draw(""); c->Update();
-  TPaveStats* statsE_S = (TPaveStats*)c->GetPrimitive("stats");
-  statsE_S->SetName("Scint");
-  statsE_S->SetTextColor(kRed);
-  statsE_S->SetX1NDC(.7);
-  statsE_S->SetY1NDC(.4); statsE_S->SetY2NDC(.7);
+    c->cd();
+    tE_S->SetTitle("");
+    tE_S->Draw(""); c->Update();
+    TPaveStats* statsE_S = (TPaveStats*)c->GetPrimitive("stats");
+    statsE_S->SetName("Scint");
+    statsE_S->SetTextColor(kRed);
+    statsE_S->SetX1NDC(.7);
+    statsE_S->SetY1NDC(.4); statsE_S->SetY2NDC(.7);
 
-  tE_C->Draw("sames"); c->Update();
-  TPaveStats* statsE_C = (TPaveStats*)c->GetPrimitive("stats");
-  statsE_C->SetName("Cerenkov");
-  statsE_C->SetTextColor(kBlue);
-  statsE_C->SetX1NDC(.7);
-  statsE_C->SetY1NDC(.7); statsE_C->SetY2NDC(1.);
-  c->SaveAs("/Your/Path/ele_" + filename + "_Ecs.png");
+    tE_C->Draw("sames"); c->Update();
+    TPaveStats* statsE_C = (TPaveStats*)c->GetPrimitive("stats");
+    statsE_C->SetName("Cerenkov");
+    statsE_C->SetTextColor(kBlue);
+    statsE_C->SetX1NDC(.7);
+    statsE_C->SetY1NDC(.7); statsE_C->SetY2NDC(1.);
+    c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_Ecs.png");
+  }
 
   gStyle->SetPaintTextFormat("4.1f");
   c->cd();
@@ -294,6 +310,10 @@ int main(int argc, char* argv[]) {
   tHits_2D->GetYaxis()->SetLabelFont(42);
   tE_2D->GetXaxis()->SetLabelFont(42);
   tE_2D->GetYaxis()->SetLabelFont(42);
+
+  // For 4 by 5
+  // c->SetCanvasSize(1200,1200);
+  // tEdep_2D->SetMarkerSize(1.2);
 
   // For 27 by 27
   c->SetCanvasSize(1800,1400);
@@ -320,29 +340,27 @@ int main(int argc, char* argv[]) {
 
   tEdep_2D->Draw("COL0Z text");
   tEdep_2D->SetStats(0);
-  c->SaveAs("/Your/Path/ele_" + filename + "_Edep2D.pdf");
+  c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_Edep2D.pdf");
 
   c->SetLogz(1);
 
   tEdep_2D->Draw("COL0Z TEXT"); 
   tEdep_2D->SetStats(0);
-  c->SaveAs("/Your/Path/ele_" + filename + "_Edep2D_Log.pdf"); 
+  c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_Edep2D_Log.pdf"); 
 
   tHits_2D->Draw("COL0Z TEXT"); 
   tHits_2D->SetStats(0);
-  c->SaveAs("/Your/Path/ele_" + filename + "_Hits2D_Log.pdf"); 
+  c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_Hits2D_Log.pdf"); 
 
-  tE_2D->Draw("COL0Z TEXT"); 
-  tE_2D->SetStats(0);
-  c->SaveAs("/Your/Path/ele_" + filename + "_E2D_Log.pdf"); 
+  if (doCalib) {
+    tE_2D->Draw("COL0Z TEXT"); 
+    tE_2D->SetStats(0);
+    c->SaveAs("./plot/260128_Calib/20GeV/ele_" + filename + "_E2D_Log.pdf"); 
+  }
   
   c->SetLogz(0);
   tEdep->SetOption("HIST");
   tEdep_oneTower->SetOption("HIST");
-
-  grE_C->Write();
-  grE_S->Write();
-  grE_SC->Write();
 
   file->Close();
 }
