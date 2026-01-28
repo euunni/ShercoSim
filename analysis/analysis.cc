@@ -360,7 +360,7 @@ int main(int argc, char* argv[]) {
   
   c->SetLogz(0);
   tEdep->SetOption("HIST");
-  tEdep_oneTower->SetOption("HIST");ㄹㅇㄹ
+  tEdep_oneTower->SetOption("HIST");
 
   file->Close();
 }

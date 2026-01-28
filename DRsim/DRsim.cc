@@ -44,10 +44,10 @@ int main(int argc, char** argv) {
   G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
   physicsList->RegisterPhysics(opticalPhysics);
   auto* optParams = G4OpticalParameters::Instance();
-  optParams->SetCerenkovEnabled(true);
-  optParams->SetScintillationEnabled(true);
+  optParams->SetProcessActivation("Cerenkov", true);
+  optParams->SetProcessActivation("Scintillation", true);
   optParams->SetCerenkovTrackSecondariesFirst(true);
-  optParams->SetScintillationTrackSecondariesFirst(true);
+  optParams->SetScintTrackSecondariesFirst(true);
   runManager->SetUserInitialization(physicsList);
 
   // User action initialization
