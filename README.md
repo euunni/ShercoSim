@@ -1,5 +1,6 @@
 # DRC cosmic : 27 by 27 geometry
 Repository for GEANT4 simulation &amp; analysis of the dual-readout calorimeter for general purpose.
+This package is executable on CentOS7.
 
 ## How-to
 ### Compile
@@ -8,7 +9,7 @@ After fetching the repository, do
     cd install
     source envset.sh
     cd ../build
-    cmake -DCMAKE_INSTALL_PREFIX=<path_to_install_directory> ..
+    cmake ../ -DCMAKE_INSTALL_PREFIX=../install
     make -j4 install
 
 ### Analysis
