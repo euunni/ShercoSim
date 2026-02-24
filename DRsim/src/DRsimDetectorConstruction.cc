@@ -16,6 +16,7 @@
 #include "G4SolidStore.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4GeometryManager.hh"
+#include "G4Exception.hh"
 
 #include "G4Colour.hh"
 #include "G4SystemOfUnits.hh"
@@ -100,10 +101,14 @@ void DRsimDetectorConstruction::DefineMaterials() {
 }
 
 G4VPhysicalVolume* DRsimDetectorConstruction::Construct() {
-  G4GeometryManager::GetInstance()->OpenGeometry();
-  G4PhysicalVolumeStore::GetInstance()->Clean();
-  G4LogicalVolumeStore::GetInstance()->Clean();
-  G4SolidStore::GetInstance()->Clean();
+  if (fNofModules > kMaxModules) {
+    G4Exception(
+      "DRsimDetectorConstruction::Construct",
+      "DRSIM_GEOM_001",
+      FatalException,
+      "fNofModules exceeds kMaxModules. Increase kMaxModules or reduce fNofRow/fNofCol."
+    );
+  }
 
   checkOverlaps = false;
 

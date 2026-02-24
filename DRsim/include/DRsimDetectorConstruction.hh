@@ -38,6 +38,8 @@ public:
   static int fNofCol;
 
 private:
+  static constexpr int kMaxModules = 1024;
+
   void DefineCommands();
   void DefineMaterials();
   G4Material* FindMaterial(G4String matName) { return fMaterials->GetMaterial(matName); }
@@ -103,17 +105,17 @@ private:
   G4VSolid* tfiberCladIntersection;
   G4VSolid* tfiberCoreIntersection;
 
-  G4LogicalVolume* ModuleLogical[100];
+  G4LogicalVolume* ModuleLogical[kMaxModules];
 
-  G4LogicalVolume* PMTGLogical[100];
-  G4LogicalVolume* PMTcathLogical[100];
-  G4LogicalVolume* PMTcellLogical[100];
-  G4LogicalVolume* PMTfilterLogical[100];
-  G4LogicalVolume* ReflectorMirrorLogical[100];
+  G4LogicalVolume* PMTGLogical[kMaxModules];
+  G4LogicalVolume* PMTcathLogical[kMaxModules];
+  G4LogicalVolume* PMTcellLogical[kMaxModules];
+  G4LogicalVolume* PMTfilterLogical[kMaxModules];
+  G4LogicalVolume* ReflectorMirrorLogical[kMaxModules];
 
-  vector<G4LogicalVolume*> fiberUnitIntersection[100];
-  vector<G4LogicalVolume*> fiberCladIntersection[100];
-  vector<G4LogicalVolume*> fiberCoreIntersection[100];
+  vector<G4LogicalVolume*> fiberUnitIntersection[kMaxModules];
+  vector<G4LogicalVolume*> fiberCladIntersection[kMaxModules];
+  vector<G4LogicalVolume*> fiberCoreIntersection[kMaxModules];
 
   DRsimInterface::hitXY fTowerXY;
   std::vector<DRsimInterface::DRsimModuleProperty> fModuleProp;
