@@ -12,6 +12,10 @@ After fetching the repository, do
     cmake ../ -DCMAKE_INSTALL_PREFIX=../install
     make -j4 install
 
+### Simulation
+
+    ./bin/DRsim <macro_file> <seed> <outputfile_name>
+    
 ### Analysis
 
     ./bin/analysis <path_to_root_files> <low_edge_of_hist> <truth_E> <high_edge> <outputfile_name>
