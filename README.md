@@ -14,10 +14,12 @@ After fetching the repository, do
 
 ### Simulation
 
+    In [install] directory,
     ./bin/DRsim <macro_file> <seed> <outputfile_name>
     
 ### Analysis
-
+    
+    In [install] directory,
     ./bin/analysis <path_to_root_files> <low_edge_of_hist> <truth_E> <high_edge> <outputfile_name>
 
 e.g.)
