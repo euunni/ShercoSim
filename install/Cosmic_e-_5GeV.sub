@@ -1,10 +1,10 @@
 universe   = vanilla
-executable = 10GeV.sh
+executable = Cosmic_e-_5GeV.sh
 arguments  = $(ProcId)
 
-output = /your/path/Cosmic_e-_5GeV/log/$(ProcId).out
-error = /your/path/Cosmic_e-_5GeV/log/$(ProcId).err
-log = /your/path/Cosmic_e-_5GeV/log/$(ProcId).log
+output = /your/path/log/$(ProcId).out
+error = /your/path/log/$(ProcId).err
+log = /your/path/log/$(ProcId).log
 
 request_memory = 1 GB
 

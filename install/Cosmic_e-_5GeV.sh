@@ -13,4 +13,4 @@ export PYTHIA8DATA=/cvmfs/sft.cern.ch/lcg/releases/LCG_96b/MCGenerators/pythia8/
 export ROOT_INCLUDE_PATH=/cvmfs/sft.cern.ch/lcg/releases/LCG_96b/hepmc3/3.1.2/x86_64-centos7-gcc8-opt/include:$ROOT_INCLUDE_PATH
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HEPMC_DIR/lib64:$FASTJET_DIR/lib:$PYTHIA_DIR/lib:$PWD/lib
 
-./bin/DRsim Cosmic_e-_5GeV.mac $1 /your/path/Cosmic_e-_5GeV/root/Cosmic_e-_5GeV
+./bin/DRsim Cosmic_e-_5GeV.mac $1 /your/path/root/Cosmic_e-_5GeV
