@@ -50,9 +50,6 @@ private:
                     std::vector<G4LogicalVolume*> fiberUnitIntersection_[], std::vector<G4LogicalVolume*> fiberCladIntersection_[], std::vector<G4LogicalVolume*> fiberCoreIntersection_[], 
                     std::vector<DRsimInterface::DRsimModuleProperty>& towerProps_);
 
-  void FiberImplement(G4int i, G4LogicalVolume* ModuleLogical__[], 
-                   std::vector<G4LogicalVolume*> fiberUnitIntersection__[], std::vector<G4LogicalVolume*> fiberCladIntersection__[], std::vector<G4LogicalVolume*> fiberCoreIntersection__[]);
-
   G4bool checkOverlaps;
   G4GenericMessenger* fMessenger;
   DRsimMaterials* fMaterials;
